@@ -6,6 +6,8 @@ import {
   FolderDoc,
   NoteStorage,
   PopulatedTagDoc,
+  NoteStorageData,
+  LiteStorageStorageItem,
 } from './types'
 import { generateId, escapeRegExp } from '../string'
 
@@ -29,12 +31,23 @@ export function generateNoteId(): string {
   return `${NOTE_ID_PREFIX}${generateId()}`
 }
 
+export function generateFolderId(): string {
+  return `${FOLDER_ID_PREFIX}${generateId()}`
+}
+
 export function excludeNoteIdPrefix(noteId: string): string {
   return noteId.replace(new RegExp(`^${NOTE_ID_PREFIX}`), '')
 }
 
 export function excludeFileProtocol(src: string) {
   return src.replace('file://', '')
+}
+
+export function prependFolderIdPrefix(folderPathname: string): string {
+  if (new RegExp(`^${FOLDER_ID_PREFIX}`).test(folderPathname)) {
+    return folderPathname
+  }
+  return `${FOLDER_ID_PREFIX}${folderPathname}`
 }
 
 export function getWorkspaceHref(storage: NoteStorage, query?: any): string {
@@ -215,4 +228,15 @@ export function getAllParentFolderPathnames(pathname: string) {
 
 export function normalizeTagColor(tag: PopulatedTagDoc): string {
   return typeof tag.data.color == 'string' ? tag.data.color : ''
+}
+
+export function mapStorageToLiteStorageData(
+  storage: NoteStorage | NoteStorageData
+): LiteStorageStorageItem {
+  const { id, name } = storage
+  return {
+    id,
+    name,
+    location: storage.location,
+  }
 }
