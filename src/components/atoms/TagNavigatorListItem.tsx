@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react'
 import { mdiClose } from '@mdi/js'
 import { useRouter } from '../../lib/router'
 import { useTranslation } from 'react-i18next'
-import { analyticsEvents, useAnalytics } from '../../lib/analytics'
 import DialogColorPicker from './dialog/DialogColorPicker'
 import { PopulatedTagDoc } from '../../lib/db/types'
 import { isColorBright } from '../../lib/colors'
@@ -43,8 +42,8 @@ const TagItemAnchor = styled.button<BaseTheme & TagStyleProps>`
   filter: invert(
     ${({ theme, color }) =>
       isColorBright((color as string) || theme.colors.background.secondary)
-        ? 100
-        : 0}%
+        ? '100%'
+        : '0%'}
   );
 `
 
@@ -55,15 +54,16 @@ const TagRemoveButton = styled.button<BaseTheme & TagStyleProps>`
   border: none;
   transition: color 200ms ease-in-out;
   color: #fff;
-  filter: invert(
-    ${({ theme, color }) =>
-      isColorBright((color as string) || theme.colors.background.secondary)
-        ? 100
-        : 0}%
-  );
   width: 24px;
   height: 24px;
   ${flexCenter}
+
+  filter: invert(
+    ${({ theme, color }) =>
+      isColorBright((color as string) || theme.colors.background.secondary)
+        ? '100%'
+        : '0%'}
+  );
 `
 
 interface TagNavigatorListItemProps {
@@ -85,7 +85,6 @@ const TagNavigatorListItem = ({
 }: TagNavigatorListItemProps) => {
   const { t } = useTranslation()
   const { push } = useRouter()
-  const { report } = useAnalytics()
 
   const [colorPickerModal, showColorPickerModal] = useState(false)
   const [tagColor, setTagColor] = useState(normalizeTagColor(tag))
@@ -135,7 +134,6 @@ const TagNavigatorListItem = ({
           title={t('tag.removeX', { tag: tag.name })}
           onClick={() => {
             removeTagByName(tag.name)
-            report(analyticsEvents.removeNoteTag)
           }}
         >
           <Icon path={mdiClose} />

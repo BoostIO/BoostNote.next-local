@@ -1,7 +1,7 @@
 import { NoteStorage } from '../../lib/db/types'
 import { getArchiveHref } from '../../lib/db/utils'
 import Application from '../Application'
-import { topParentId } from '../../cloud/lib/mappers/topbarTree'
+import { topParentId } from '../../lib/v2/mappers/local/topbarTree'
 import { mdiArchive } from '@mdi/js'
 import React from 'react'
 import ArchiveDetail from '../organisms/ArchiveDetail'

@@ -1,10 +1,8 @@
 import { NoteStorage } from '../../lib/db/types'
 import { getTimelineHref, values } from '../../lib/db/utils'
 import Application from '../Application'
-import { topParentId } from '../../cloud/lib/mappers/topbarTree'
 import { mdiClockOutline } from '@mdi/js'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import EmojiIcon from '../../cloud/components/atoms/EmojiIcon'
 import { formatDistanceToNow, isBefore, isSameDay, subDays } from 'date-fns'
 import { partition } from 'ramda'
 import { useRouter } from '../../lib/router'
@@ -13,6 +11,8 @@ import styled from '../../shared/lib/styled'
 import { linkText } from '../../lib/styled/styleFunctionsLocal'
 import Button from '../../shared/components/atoms/Button'
 import { compareDateString } from '../../shared/lib/date'
+import Icon from '../../shared/components/atoms/Icon'
+import { topParentId } from '../../lib/v2/mappers/local/topbarTree'
 
 interface TimelinePageProps {
   storage: NoteStorage
@@ -151,12 +151,8 @@ const TimelinePage = ({ storage }: TimelinePageProps) => {
           },
           header: (
             <>
-              <EmojiIcon
-                defaultIcon={mdiClockOutline}
-                style={{ marginRight: 10 }}
-                size={16}
-              />
-              <span style={{ marginRight: 10 }}>Timeline</span>
+              <Icon path={mdiClockOutline} size={16} />
+              <span style={{ marginRight: 10, marginLeft: 10 }}>Timeline</span>
             </>
           ),
         }}
@@ -191,12 +187,8 @@ const TimelinePage = ({ storage }: TimelinePageProps) => {
         },
         header: (
           <>
-            <EmojiIcon
-              defaultIcon={mdiClockOutline}
-              style={{ marginRight: 10 }}
-              size={16}
-            />
-            <span style={{ marginRight: 10 }}>Timeline</span>
+            <Icon path={mdiClockOutline} size={16} />
+            <span style={{ marginRight: 10, marginLeft: 10 }}>Timeline</span>
           </>
         ),
       }}

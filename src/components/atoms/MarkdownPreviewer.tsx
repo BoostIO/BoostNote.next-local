@@ -24,8 +24,8 @@ import {
   rehypeMermaid,
   remarkCharts,
   remarkPlantUML,
-} from '../../cloud/lib/charts'
-import { rehypePosition } from '../../cloud/lib/rehypePosition'
+} from '../../lib/markdown/charts'
+import { rehypePosition } from '../../lib/markdown/rehypePosition'
 import styled from '../../shared/lib/styled'
 import rehypeCodeMirror from '../../shared/lib/codemirror/rehypeCodeMirror'
 

@@ -12,26 +12,17 @@ import { values } from '../../lib/db/utils'
 import { MenuItemConstructorOptions } from 'electron'
 import { useStorageRouter } from '../../lib/storageRouter'
 import {
-  BoostHubTeamsShowRouteParams,
   StorageNotesRouteParams,
   StorageTagsRouteParams,
   useRouteParams,
 } from '../../lib/routeParams'
-import {
-  mdiCloudOffOutline,
-  mdiCog,
-  mdiLogin,
-  mdiLogout,
-  mdiMagnify,
-  mdiPlus,
-} from '@mdi/js'
+import { mdiCloudOffOutline, mdiCog, mdiMagnify } from '@mdi/js'
 import { noteDetailFocusTitleInputEventEmitter } from '../../lib/events'
 import { useTranslation } from 'react-i18next'
 import { useSearchModal } from '../../lib/searchModal'
 import styled from '../../shared/lib/styled'
 import cc from 'classcat'
 import { useGeneralStatus } from '../../lib/generalStatus'
-import { AppUser } from '../../shared/lib/mappers/users'
 import { useLocalUI } from '../../lib/v2/hooks/local/useLocalUI'
 import {
   mapTree,
@@ -43,19 +34,13 @@ import { CollapsableType } from '../../lib/v2/stores/sidebarCollapse'
 import { useSidebarCollapse } from '../../lib/v2/stores/sidebarCollapse'
 import { useCloudIntroModal } from '../../lib/cloudIntroModal'
 import { mapLocalSpace } from '../../lib/v2/mappers/local/sidebarSpaces'
-import { osName } from '../../shared/lib/platform'
-import {
-  SidebarSpace,
-  SidebarSpaceContentRow,
-} from '../../shared/components/organisms/Sidebar/molecules/SidebarSpaces'
-import { useBoostHub } from '../../lib/boosthub'
+import { SidebarSpace } from '../../shared/components/organisms/Sidebar/molecules/SidebarSpaces'
 import NewDocButton from '../molecules/NewDocButton'
 import Sidebar from '../../shared/components/organisms/Sidebar'
 import SidebarHeader, {
   SidebarControls,
 } from '../../shared/components/organisms/Sidebar/atoms/SidebarHeader'
 import SidebarButtonList from '../../shared/components/organisms/Sidebar/molecules/SidebarButtonList'
-import plur from 'plur'
 
 interface SidebarContainerProps {
   workspace?: NoteStorage
@@ -69,14 +54,11 @@ const SidebarContainer = ({
   const { createNote, storageMap } = useDb()
   const { push, hash, pathname } = useRouter()
   const { navigate } = useStorageRouter()
-  const { preferences, openTab, togglePreferencesModal } = usePreferences()
+  const { openTab, togglePreferencesModal } = usePreferences()
   const routeParams = useRouteParams() as
     | StorageTagsRouteParams
     | StorageNotesRouteParams
-    | BoostHubTeamsShowRouteParams
   const { t } = useTranslation()
-  const boostHubUserInfo = preferences['cloud.user']
-  const { signOut } = useBoostHub()
   const {
     createFolderApi,
     createDocApi,
@@ -99,7 +81,6 @@ const SidebarContainer = ({
     toggleShowingCloudIntroModal,
     showingCloudIntroModal,
   } = useCloudIntroModal()
-  const usersMap = new Map<string, AppUser>()
   const [initialLoadDone] = useState(true)
   const {
     sideBarOpenedLinksIdsSet,
@@ -385,13 +366,6 @@ const SidebarContainer = ({
     toggleItem,
   ])
 
-  const activeBoostHubTeamDomain = useMemo<string | null>(() => {
-    if (routeParams.name !== 'boosthub.teams.show') {
-      return null
-    }
-    return routeParams.domain
-  }, [routeParams])
-
   const spaces = useMemo(() => {
     const activeWorkspaceId: string | null =
       workspace == null ? null : workspace.id
@@ -436,103 +410,16 @@ const SidebarContainer = ({
         )
       )
     })
-    generalStatus.boostHubTeams.forEach((boostHubTeam, index) => {
-      const roles = boostHubTeam.permissions.reduce(
-        (acc, val) => {
-          if (val.role === 'viewer') {
-            acc.viewers = acc.viewers + 1
-          } else {
-            acc.members = acc.members + 1
-          }
-          return acc
-        },
-        { viewers: 0, members: 0 }
-      )
-
-      allSpaces.push({
-        label: boostHubTeam.name,
-        icon: boostHubTeam.iconUrl,
-        description: `${roles.members} ${plur('Member', roles.members)} ${
-          roles.viewers > 0
-            ? `- ${roles.viewers} ${plur('Viewer', roles.viewers)}`
-            : ''
-        }`,
-        subscriptionPlan:
-          boostHubTeam.subscription == null
-            ? 'Free'
-            : boostHubTeam.trial
-            ? 'Trial'
-            : boostHubTeam.subscription.plan,
-        active: activeBoostHubTeamDomain === boostHubTeam.domain,
-        tooltip: `${osName === 'macos' ? '⌘' : 'Ctrl'} ${
-          localSpaces.length + index + 1
-        }`,
-        linkProps: {
-          onClick: (event) => {
-            event.preventDefault()
-            push(`/app/boosthub/teams/${boostHubTeam.domain}`)
-          },
-        },
-      })
-    })
 
     return allSpaces
   }, [
     workspace,
     localSpaces,
-    generalStatus.boostHubTeams,
     navigate,
     t,
     openWorkspaceEditForm,
     removeWorkspace,
-    activeBoostHubTeamDomain,
-    push,
   ])
-
-  const spaceBottomRows = useMemo(() => {
-    const rows: SidebarSpaceContentRow[] = []
-    rows.push({
-      label: 'Create Space',
-      icon: mdiPlus,
-      linkProps: {
-        onClick: (event) => {
-          event.preventDefault()
-          if (boostHubUserInfo == null) {
-            push('/app/boosthub/login')
-          } else {
-            push('/app/boosthub/teams')
-          }
-        },
-      },
-    })
-
-    if (boostHubUserInfo == null) {
-      rows.push({
-        label: 'Sign in',
-        icon: mdiLogin,
-        linkProps: {
-          onClick: (event) => {
-            event.preventDefault()
-
-            push('/app/boosthub/login')
-          },
-        },
-      })
-    } else {
-      rows.push({
-        label: 'Sign Out Team Account',
-        icon: mdiLogout,
-        linkProps: {
-          onClick: (event) => {
-            event.preventDefault()
-            signOut()
-          },
-        },
-      })
-    }
-
-    return rows
-  }, [boostHubUserInfo, push, signOut])
 
   const activeSpace = spaces.find((space) => space.active)
   const sidebarHeader = useMemo(() => {
@@ -605,13 +492,11 @@ const SidebarContainer = ({
         popOver={showSpaces ? 'spaces' : null}
         onSpacesBlur={() => setShowSpaces(false)}
         spaces={spaces}
-        spaceBottomRows={spaceBottomRows}
         sidebarExpandedWidth={generalStatus.sideBarWidth}
         tree={tree}
         sidebarResize={sidebarResize}
         header={sidebarHeader}
         treeBottomRows={sidebarFooter}
-        users={usersMap}
       />
     </NavigatorContainer>
   )

@@ -1,6 +1,5 @@
 import {
   NoteStorage,
-  PouchNoteStorageData,
   ObjectMap,
   NoteDoc,
   NoteDocEditibleProps,
@@ -16,7 +15,6 @@ import {
 import { useState, useCallback } from 'react'
 import ow from 'ow'
 import { schema, isValid } from '../predicates'
-import PouchNoteDb from './PouchNoteDb'
 import {
   getFolderPathname,
   getParentFolderPathname,
@@ -24,7 +22,6 @@ import {
   entries,
 } from './utils'
 import { generateId } from '../string'
-import PouchDB from './PouchDB'
 import { LiteStorage } from 'ltstrg'
 import { produce, enableMapSet } from 'immer'
 import { RouterStore } from '../router'
@@ -43,7 +40,7 @@ export interface DbStore {
   initialize: () => Promise<ObjectMap<NoteStorage>>
   createStorage: (
     name: string,
-    props?: { type: 'fs'; location: string }
+    props: { location: string }
   ) => Promise<NoteStorage>
   removeStorage: (id: string) => Promise<void>
   renameStorage: (id: string, name: string) => void
@@ -189,10 +186,10 @@ export function createDbStoreCreator(
     )
 
     const createStorage = useCallback(
-      async (name: string, props?: { type: 'fs'; location: string }) => {
+      async (name: string, props: { location: string }) => {
         const id = generateId()
 
-        const storageData: PouchNoteStorageData = { id, name }
+        const storageData = { id, name }
 
         const storage = await prepareStorage({
           ...storageData,
@@ -237,10 +234,6 @@ export function createDbStoreCreator(
         const storage = storageMap[id]
         if (storage == null) {
           return
-        }
-
-        if (storage.type !== 'fs') {
-          await storage.db.pouchDb.destroy()
         }
 
         let newStorageMap: ObjectMap<NoteStorage>
@@ -1137,11 +1130,12 @@ export function createDbStoreCreator(
 const storageDataPredicate = schema({
   id: ow.string,
   name: ow.string,
+  location: ow.string,
 })
 
 export function getStorageDataList(
   liteStorage: LiteStorage
-): PouchNoteStorageData[] | null {
+): NoteStorageData[] | null {
   const serializedStorageDataList = liteStorage.getItem(storageDataListKey)
   try {
     const parsedStorageDataList = JSON.parse(serializedStorageDataList || '[]')
@@ -1149,7 +1143,7 @@ export function getStorageDataList(
       throw new Error('storage data is corrupted')
     }
 
-    return parsedStorageDataList.reduce<PouchNoteStorageData[]>(
+    return parsedStorageDataList.reduce<NoteStorageData[]>(
       (validatedList, parsedStorageData) => {
         if (isValid(parsedStorageData, storageDataPredicate)) {
           validatedList.push(parsedStorageData)
@@ -1182,18 +1176,12 @@ function saveStorageDataList(
     JSON.stringify(
       values(storageMap).map((storage) => {
         const { id, name } = storage
-        if (storage.type === 'fs') {
-          return {
-            id,
-            name,
-            type: 'fs',
-            location: storage.location,
-          }
-        }
+
         return {
           id,
           name,
-          cloudStorage: storage.cloudStorage,
+          type: 'fs',
+          location: storage.location,
         }
       })
     )
@@ -1204,16 +1192,7 @@ async function prepareStorage(
   storageData: NoteStorageData
 ): Promise<NoteStorage> {
   const { id, name } = storageData
-  const db =
-    storageData.type === 'fs'
-      ? new FSNoteDb(id, name, storageData.location)
-      : new PouchNoteDb(
-          new PouchDB(id, {
-            adapter: process.env.NODE_ENV === 'test' ? 'memory' : 'idb',
-          }),
-          id,
-          name
-        )
+  const db = new FSNoteDb(id, name, storageData.location)
   await db.init()
 
   const { noteMap, folderMap, tagMap } = await db.getAllDocsMap()
@@ -1256,31 +1235,15 @@ async function prepareStorage(
   }
   const bookmarkedItemIds = [...bookmarkedIdSet]
 
-  if (storageData.type === 'fs') {
-    return {
-      type: 'fs',
-      id,
-      name,
-      location: storageData.location,
-      noteMap,
-      folderMap: populatedFolderMap,
-      tagMap: populatedTagMap,
-      attachmentMap,
-      db: db as FSNoteDb,
-      bookmarkedItemIds,
-    }
-  }
-
   return {
-    type: 'pouch',
     id,
     name,
-    cloudStorage: storageData.cloudStorage,
+    location: storageData.location,
     noteMap,
     folderMap: populatedFolderMap,
     tagMap: populatedTagMap,
     attachmentMap,
-    db: db as PouchNoteDb,
+    db: db as FSNoteDb,
     bookmarkedItemIds,
   }
 }

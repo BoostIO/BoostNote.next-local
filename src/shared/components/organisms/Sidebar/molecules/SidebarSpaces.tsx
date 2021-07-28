@@ -11,7 +11,6 @@ import { capitalize } from 'lodash'
 
 export interface SidebarSpaceProps {
   spaces: SidebarSpace[]
-  spaceBottomRows: SidebarSpaceContentRow[]
   onSpacesBlur: () => void
 }
 
@@ -34,7 +33,6 @@ export type SidebarSpace = {
 
 const SidebarSpaces: AppComponent<SidebarSpaceProps> = ({
   spaces,
-  spaceBottomRows,
   className,
   onSpacesBlur,
 }) => (
@@ -45,14 +43,6 @@ const SidebarSpaces: AppComponent<SidebarSpaceProps> = ({
           row={row}
           id={`space-top-${i}`}
           key={`space-top-${i}`}
-          onSpacesBlur={onSpacesBlur}
-        />
-      ))}
-      {spaceBottomRows.map((row, i) => (
-        <SidebarContentRow
-          row={row}
-          key={`space-bottom-${i}`}
-          id={`space-bottom-${i}`}
           onSpacesBlur={onSpacesBlur}
         />
       ))}
@@ -117,36 +107,6 @@ const SidebarSpace = ({
     {row.tooltip != null && (
       <span className='sidebar__spaces__tooltip'>{row.tooltip}</span>
     )}
-  </a>
-)
-
-const SidebarContentRow = ({
-  row,
-  id,
-  onSpacesBlur,
-}: {
-  row: SidebarSpaceContentRow
-  id: string
-  onSpacesBlur: () => void
-}) => (
-  <a
-    {...row.linkProps}
-    onClick={(event) => {
-      if (row.linkProps.onClick == null) {
-        return
-      }
-
-      event.preventDefault()
-      row.linkProps.onClick(event)
-      onSpacesBlur()
-    }}
-    id={id}
-    className='sidebar__spaces__item sidebar__spaces__item--bottom'
-  >
-    <div className='sidebar__spaces__icon'>
-      <Icon size={20} path={row.icon} />
-    </div>
-    <span className='sidebar__spaces__label'>{row.label}</span>
   </a>
 )
 

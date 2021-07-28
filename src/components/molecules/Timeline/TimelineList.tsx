@@ -4,7 +4,7 @@ import { NoteDoc, NoteStorage } from '../../../lib/db/types'
 import { TimelineEvent } from '../../pages/TimelinePage'
 import { useUpDownNavigationListener } from '../../../shared/lib/keyboard'
 import TimelineListItem from './TimelineListItem'
-import { getHexFromUUID } from '../../../cloud/lib/utils/string'
+import { getHexFromUUID } from '../../../lib/string'
 
 export interface TimelineListProps {
   heading: string

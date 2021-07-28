@@ -8,11 +8,6 @@ import {
 import styled from '../../../lib/styled'
 import WidthEnlarger from '../../atoms/WidthEnlarger'
 import Spinner from '../../atoms/Spinner'
-import { AppUser } from '../../../lib/mappers/users'
-import NotificationList, {
-  NotificationState,
-} from '../../molecules/NotificationList'
-import { Notification } from '../../../../cloud/interfaces/db/notifications'
 import SidebarTree, { SidebarNavCategory } from './molecules/SidebarTree'
 import SidebarPopOver from './atoms/SidebarPopOver'
 import SidebarSpaces, { SidebarSpaceProps } from './molecules/SidebarSpaces'
@@ -29,44 +24,24 @@ type SidebarProps = {
   header?: React.ReactNode
   tree?: SidebarNavCategory[]
   treeBottomRows?: React.ReactNode
-  users: Map<string, AppUser>
-  notificationState?: NotificationState
-  getMoreNotifications?: () => void
-  notificationClick?: (notification: Notification) => void
 } & SidebarSpaceProps
 
 const Sidebar = ({
   popOver,
   onSpacesBlur: onPopOverBlur,
   spaces,
-  spaceBottomRows,
   sidebarExpandedWidth = defaultSidebarExpandedWidth,
   sidebarResize,
   tree,
   header,
   treeBottomRows,
   className,
-  notificationState,
-  getMoreNotifications,
-  notificationClick,
 }: SidebarProps) => {
   return (
     <SidebarContainer className={cc(['sidebar', className])}>
       {popOver === 'spaces' ? (
         <SidebarPopOver>
-          <SidebarSpaces
-            spaces={spaces}
-            spaceBottomRows={spaceBottomRows}
-            onSpacesBlur={onPopOverBlur}
-          />
-        </SidebarPopOver>
-      ) : popOver === 'notifications' && notificationState != null ? (
-        <SidebarPopOver onClose={onPopOverBlur}>
-          <NotificationList
-            state={notificationState}
-            getMore={getMoreNotifications!}
-            onClick={notificationClick}
-          />
+          <SidebarSpaces spaces={spaces} onSpacesBlur={onPopOverBlur} />
         </SidebarPopOver>
       ) : null}
       <WidthEnlarger

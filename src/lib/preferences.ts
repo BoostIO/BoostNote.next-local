@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { preferencesKey } from './localStorageKeys'
 import { NoteSortingOptions } from './sort'
 import { sendIpcMessage } from './electronOnly'
-import { nodeEnv } from '../cloud/lib/consts'
-import { setAccessToken } from '../cloud/lib/stores/electron'
+import { nodeEnv } from './consts'
 import {
   createCodemirrorTypeKeymap,
   defaultKeymap,
@@ -54,14 +53,6 @@ export interface Preferences {
   'general.theme': ThemeTypes
   'general.noteSorting': NoteSortingOptions
   'general.enableAnalytics': boolean
-
-  // Cloud Space
-  'cloud.user': {
-    id: string
-    uniqueName: string
-    displayName: string
-    accessToken: string
-  } | null
 
   // Editor
   'editor.theme': string
@@ -130,9 +121,6 @@ const basePreferences: Preferences = {
   'general.theme': 'dark',
   'general.noteSorting': 'updated-date-dsc',
   'general.enableAnalytics': true,
-
-  // BoostHub
-  'cloud.user': null,
 
   // Editor
   'editor.theme': 'material-darker',
@@ -216,16 +204,6 @@ function usePreferencesStore() {
       i18n.changeLanguage(currentLanguage)
     }, [i18n, currentLanguage])
   }
-
-  const cloudUserInfo = preferences['cloud.user']
-  useEffect(() => {
-    if (cloudUserInfo == null) {
-      setAccessToken(null)
-      return
-    }
-
-    setAccessToken(cloudUserInfo.accessToken)
-  }, [cloudUserInfo])
 
   const keymap = mergedPreferences['general.keymap']
   const getAcceleratorTypeKeymap = useCallback(

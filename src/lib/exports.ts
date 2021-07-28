@@ -35,9 +35,9 @@ import {
   rehypeMermaid,
   remarkCharts,
   remarkPlantUML,
-} from '../cloud/lib/charts'
+} from './markdown/charts'
 import remarkSlug from 'remark-slug'
-import { rehypePosition } from '../cloud/lib/rehypePosition'
+import { rehypePosition } from './markdown/rehypePosition'
 import remarkAdmonitions from 'remark-admonitions'
 import { getGlobalCss } from '../shared/components/atoms/GlobalStyle'
 import { selectV2Theme } from '../shared/lib/styled/styleFunctions'

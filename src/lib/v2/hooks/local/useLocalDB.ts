@@ -235,7 +235,7 @@ export type CreateNoteRequestBody = {
 
 export type CreateStorageRequestBody = {
   name: string
-  props?: { type: 'fs'; location: string }
+  props: { location: string }
 }
 
 export interface UpdateFolderRequestBody {

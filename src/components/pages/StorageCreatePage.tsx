@@ -2,7 +2,7 @@ import React from 'react'
 import FSStorageCreateForm from '../organisms/FSStorageCreateForm'
 import { mdiBookPlusMultiple } from '@mdi/js'
 import Application from '../Application'
-import EmojiIcon from '../../cloud/components/atoms/EmojiIcon'
+import Icon from '../../shared/components/atoms/Icon'
 
 const StorageCreatePage = () => {
   return (
@@ -12,12 +12,10 @@ const StorageCreatePage = () => {
         reduced: true,
         header: (
           <>
-            <EmojiIcon
-              defaultIcon={mdiBookPlusMultiple}
-              style={{ marginRight: 10 }}
-              size={16}
-            />
-            <span style={{ marginRight: 10 }}>Create Local Space</span>
+            <Icon path={mdiBookPlusMultiple} size={16} />
+            <span style={{ marginLeft: 10, marginRight: 10 }}>
+              Create Local Space
+            </span>
           </>
         ),
       }}

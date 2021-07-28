@@ -19,7 +19,6 @@ import NoteDetailTagNavigator from '../molecules/NoteDetailTagNavigator'
 import { useDb } from '../../lib/db'
 import { getFormattedDateTime } from '../../lib/time'
 import { useTranslation } from 'react-i18next'
-import { useAnalytics, analyticsEvents } from '../../lib/analytics'
 import {
   exportNoteAsMarkdownFile,
   exportNoteAsHtmlFile,
@@ -51,7 +50,6 @@ const NoteContextView = ({ storage, note }: NoteContextViewProps) => {
   } = useDb()
   const { pushMessage } = useToast()
   const { t } = useTranslation()
-  const { report } = useAnalytics()
   const storageId = storage.id
   const noteId = note._id
   const { preferences } = usePreferences()
@@ -127,9 +125,8 @@ const NoteContextView = ({ storage, note }: NoteContextViewProps) => {
       return
     }
 
-    report(analyticsEvents.trashNote)
     await trashNote(storageId, noteId)
-  }, [report, storageId, noteId, trashNote])
+  }, [storageId, noteId, trashNote])
 
   const untrash = useCallback(async () => {
     if (noteId == null) {

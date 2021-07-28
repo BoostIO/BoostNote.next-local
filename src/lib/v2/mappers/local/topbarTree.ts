@@ -8,8 +8,9 @@ import {
   getFolderPathname,
   getDocHref,
 } from '../../../db/utils'
-import { topParentId } from '../../../../cloud/lib/mappers/topbarTree'
 import { BreadCrumbTreeItem } from '../../../../shared/lib/mappers/types'
+
+export const topParentId = 'root'
 
 export function mapTopBarTree(
   noteMap: ObjectMap<NoteDoc>,

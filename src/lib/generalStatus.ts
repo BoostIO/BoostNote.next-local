@@ -4,9 +4,7 @@ import { useSetState } from 'react-use'
 import { generalStatusKey } from './localStorageKeys'
 import { createStoreContext } from './context'
 import { getFolderItemId, getStorageItemId } from './nav'
-import { SerializedSubscription } from '../cloud/interfaces/db/subscription'
 import { SidebarTreeSortingOrder } from '../shared/lib/sidebar'
-import { SerializedUserTeamPermissions } from '../cloud/interfaces/db/userTeamPermissions'
 
 export type ViewModeType = 'edit' | 'preview' | 'split'
 
@@ -16,16 +14,6 @@ export interface GeneralStatus {
   noteViewMode: ViewModeType
   preferredEditingViewMode: Exclude<ViewModeType, 'preview'>
   sideNavOpenedItemList: string[]
-  boostHubTeams: {
-    id: string
-    name: string
-    domain: string
-    iconUrl?: string
-    createdAt: string
-    subscription?: SerializedSubscription
-    permissions: SerializedUserTeamPermissions[]
-    trial?: boolean
-  }[]
   showingNoteContextMenu: boolean
   sidebarTreeSortingOrder: SidebarTreeSortingOrder
   focusOnEditorCursor: boolean
@@ -55,7 +43,6 @@ const baseGeneralStatus: GeneralStatus = {
   noteViewMode: 'split',
   preferredEditingViewMode: 'split',
   sideNavOpenedItemList: [],
-  boostHubTeams: [],
   showingNoteContextMenu: false,
   sidebarTreeSortingOrder: 'last-updated',
   focusOnEditorCursor: false,

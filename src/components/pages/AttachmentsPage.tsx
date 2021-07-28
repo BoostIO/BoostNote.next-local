@@ -11,10 +11,10 @@ import { mdiPaperclip } from '@mdi/js'
 import PageDraggableHeader from '../atoms/PageDraggableHeader'
 import { NoteStorage } from '../../lib/db/types'
 import Application from '../Application'
-import { topParentId } from '../../cloud/lib/mappers/topbarTree'
 import { getAttachmentsHref } from '../../lib/db/utils'
 import { useRouter } from '../../lib/router'
 import styled from '../../shared/lib/styled'
+import { topParentId } from '../../lib/v2/mappers/local/topbarTree'
 
 const Container = styled.div`
   height: 100%;

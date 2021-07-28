@@ -6,8 +6,8 @@ import { PopulatedTagDoc, NoteStorage } from '../../lib/db/types'
 import { entries } from '../../lib/db/utils'
 import styled from '../../shared/lib/styled'
 import { contextMenuFormItem } from '../../shared/lib/styled/styleFunctions'
-import IconMdi from '../../cloud/components/atoms/IconMdi'
 import { mdiPlus } from '@mdi/js'
+import Icon from '../../shared/components/atoms/Icon'
 
 const Container = styled.div`
   display: flex;
@@ -181,7 +181,7 @@ const NoteDetailTagNavigator = ({
         </button>
       ) : (
         <button className='tag__add' ref={buttonRef} onClick={showNewTagPopup}>
-          <IconMdi path={mdiPlus} size={16} />
+          <Icon path={mdiPlus} size={16} />
         </button>
       )}
     </Container>

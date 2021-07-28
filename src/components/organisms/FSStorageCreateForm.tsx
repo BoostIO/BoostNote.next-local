@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from '../../lib/router'
 import { useDb } from '../../lib/db'
-import { useAnalytics, analyticsEvents } from '../../lib/analytics'
 import { FormFolderSelectorInput } from '../atoms/form'
 import { useToast } from '../../shared/lib/stores/toast'
 import Form from '../../shared/components/molecules/Form'
@@ -25,12 +24,10 @@ const FSStorageCreateForm = () => {
   const { push } = useRouter()
   const { createStorage } = useDb()
   const { pushMessage } = useToast()
-  const { report } = useAnalytics()
 
   const createStorageCallback = useCallback(async () => {
     try {
-      const workspace = await createStorage(name, { type: 'fs', location })
-      report(analyticsEvents.createStorage)
+      const workspace = await createStorage(name, { location })
       push(getWorkspaceHref(workspace))
     } catch (error) {
       pushMessage({
@@ -38,7 +35,7 @@ const FSStorageCreateForm = () => {
         description: error.toString(),
       })
     }
-  }, [createStorage, name, location, report, push, pushMessage])
+  }, [createStorage, name, location, push, pushMessage])
 
   const openDialogAndStoreLocation = useCallback(async () => {
     const location = await openDialog()

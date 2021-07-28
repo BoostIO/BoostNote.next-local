@@ -11,7 +11,6 @@ import { usePreferences, EditorIndentSizeOptions } from '../../lib/preferences'
 import { themes } from '../../lib/CodeMirror'
 import CustomizedCodeEditor from '../atoms/CustomizedCodeEditor'
 import { useDebounce } from 'react-use'
-import { useAnalytics, analyticsEvents } from '../../lib/analytics'
 import Form from '../../shared/components/molecules/Form'
 import { SimpleFormSelect } from '../../shared/components/molecules/Form/atoms/FormSelect'
 
@@ -26,16 +25,14 @@ function say() {
 
 const EditorTab = () => {
   const { preferences, setPreferences } = usePreferences()
-  const { report } = useAnalytics()
 
   const selectEditorTheme = useCallback(
     (value) => {
       setPreferences({
         'editor.theme': value,
       })
-      report(analyticsEvents.updateEditorTheme)
     },
-    [setPreferences, report]
+    [setPreferences]
   )
 
   const [fontSize, setFontSize] = useState(

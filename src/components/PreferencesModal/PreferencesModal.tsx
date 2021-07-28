@@ -10,8 +10,6 @@ import { mdiClose, mdiHammerWrench } from '@mdi/js'
 import { useDb } from '../../lib/db'
 import { useRouteParams } from '../../lib/routeParams'
 import StorageTab from './StorageTab'
-import MigrationPage from './MigrationTab'
-import { useMigrations } from '../../lib/migrate/store'
 import KeymapTab from './KeymapTab'
 import styled from '../../shared/lib/styled'
 import {
@@ -109,7 +107,6 @@ const PreferencesModal = () => {
   const { closed, togglePreferencesModal, tab, openTab } = usePreferences()
   const { storageMap } = useDb()
   const routeParams = useRouteParams()
-  const { get } = useMigrations()
 
   const currentStorage = useMemo(() => {
     let storageId: string
@@ -156,11 +153,6 @@ const PreferencesModal = () => {
           return <StorageTab storage={currentStorage} />
         }
         break
-      case 'migration':
-        if (currentStorage != null) {
-          return <MigrationPage storage={currentStorage} />
-        }
-        break
     }
     return <GeneralTab />
   }, [tab, currentStorage])
@@ -198,17 +190,6 @@ const PreferencesModal = () => {
               active={tab === 'general'}
               onClick={() => openTab('general')}
             />
-            {currentStorage != null && (
-              <SettingNavButtonItem
-                label='Space'
-                active={tab === 'storage' || tab === 'migration'}
-                onClick={() =>
-                  openTab(
-                    get(currentStorage.id) != null ? 'migration' : 'storage'
-                  )
-                }
-              />
-            )}
             <SettingNavButtonItem
               label={t('editor.editor')}
               active={tab === 'editor'}

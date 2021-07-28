@@ -13,13 +13,10 @@ import { combineProviders } from './lib/context'
 import { PreferencesProvider } from './lib/preferences'
 import { GeneralStatusProvider } from './lib/generalStatus'
 import { PreviewStyleProvider } from './lib/preview'
-import { AnalyticsProvider } from './lib/analytics'
 import { StorageRouterProvider } from './lib/storageRouter'
 import { SearchModalProvider } from './lib/searchModal'
 import { CheckedFeaturesProvider } from './lib/checkedFeatures'
-import { BoostHubStoreProvider } from './lib/boosthub'
 import { CloudIntroModalProvider } from './lib/cloudIntroModal'
-import { MigrationProvider } from './lib/migrate/store'
 import { DialogProvider } from './lib/dialog'
 
 const V2CombinedProvider = combineProviders(
@@ -33,14 +30,11 @@ const V2CombinedProvider = combineProviders(
 
 const CombinedProvider = combineProviders(
   V2CombinedProvider,
-  BoostHubStoreProvider,
   SearchModalProvider,
   PreviewStyleProvider,
-  MigrationProvider,
   GeneralStatusProvider,
   DialogProvider,
   DbProvider,
-  AnalyticsProvider,
   PreferencesProvider,
   StorageRouterProvider,
   RouterProvider,

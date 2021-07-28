@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { NoteDoc, NoteStorage } from '../../../lib/db/types'
 import cc from 'classcat'
 import { mdiFileDocumentOutline } from '@mdi/js'
-import { getFormattedBoosthubDate } from '../../../cloud/lib/date'
 import Icon from '../../../shared/components/atoms/Icon'
 import { getNoteTitle } from '../../../lib/db/utils'
 import { useStorageRouter } from '../../../lib/storageRouter'
@@ -18,6 +17,7 @@ import {
 } from '../../../lib/styled/styleFunctionsLocal'
 import styled from '../../../shared/lib/styled'
 import { defaultTagColor } from '../../../lib/colors'
+import { getFormattedDate } from '../../../lib/date'
 
 interface TimelineListItemProps {
   className?: string
@@ -47,14 +47,14 @@ const TimelineListItem = ({
     if (item.archivedAt != null) {
       return (
         <div className='date-label'>
-          Archived {getFormattedBoosthubDate(item.archivedAt, true)}
+          Archived {getFormattedDate(item.archivedAt, true)}
         </div>
       )
     }
 
     return (
       <div className='date-label'>
-        Updated {getFormattedBoosthubDate(item.updatedAt, true)}
+        Updated {getFormattedDate(item.updatedAt, true)}
       </div>
     )
   }, [item.archivedAt, item.updatedAt])

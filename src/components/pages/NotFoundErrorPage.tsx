@@ -1,7 +1,7 @@
 import Application from '../Application'
 import { mdiAlertBoxOutline } from '@mdi/js'
 import React from 'react'
-import EmojiIcon from '../../cloud/components/atoms/EmojiIcon'
+import Icon from '../../shared/components/atoms/Icon'
 
 interface NoteFoundErrorPageProps {
   title: string
@@ -17,14 +17,10 @@ const NoteFoundErrorPage = ({
       hideSidebar={true}
       content={{
         header: (
-          <>
-            <EmojiIcon
-              defaultIcon={mdiAlertBoxOutline}
-              style={{ marginRight: 10, marginLeft: 15 }}
-              size={24}
-            />
-            <span style={{ marginRight: 10 }}>{title}</span>
-          </>
+          <div style={{ margin: '0 10px' }}>
+            <Icon path={mdiAlertBoxOutline} size={20} />
+            <span style={{ marginLeft: 10 }}>{title}</span>
+          </div>
         ),
       }}
     >

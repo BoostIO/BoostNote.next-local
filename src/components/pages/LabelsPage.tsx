@@ -1,11 +1,11 @@
 import { NoteStorage } from '../../lib/db/types'
 import { getLabelHref } from '../../lib/db/utils'
 import Application from '../Application'
-import { topParentId } from '../../cloud/lib/mappers/topbarTree'
 import { mdiTag } from '@mdi/js'
 import React from 'react'
 import TagDetail from '../organisms/TagDetail'
 import { useRouter } from '../../lib/router'
+import { topParentId } from '../../lib/v2/mappers/local/topbarTree'
 
 interface LabelsPageProps {
   storage: NoteStorage

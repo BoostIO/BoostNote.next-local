@@ -4,7 +4,7 @@ import { AppComponent } from '../../../../lib/types'
 import cc from 'classcat'
 import Icon from '../../../atoms/Icon'
 import { useTranslation } from 'react-i18next'
-import { lngKeys } from '../../../../../cloud/lib/i18n/types'
+import { lngKeys } from '../../../../../lib/i18n/types'
 
 export interface FormImageProps {
   onChange?: (file: File) => void

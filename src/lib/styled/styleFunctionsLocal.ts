@@ -1,6 +1,17 @@
 import styled from '../../shared/lib/styled'
 import { StyledProps } from '../../shared/lib/styled/styleFunctions'
-import { loadingColorKeyframe } from '../../cloud/lib/styled'
+import { keyframes } from 'styled-components'
+
+const loadingColorKeyframe = () => keyframes`
+ 0% {
+   color: ${({ theme }: StyledProps) => theme.colors.text.primary};
+ }
+ 50% {
+  color: ${({ theme }: StyledProps) => theme.colors.text.secondary};
+}
+ 100% {
+  color: ${({ theme }: StyledProps) => theme.colors.text.primary};
+}`
 
 export const baseIconStyle = ({ theme }: StyledProps) => `
   transition: 200ms color;

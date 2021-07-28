@@ -9,7 +9,6 @@ import React, {
 import { useEffectOnce } from 'react-use'
 import { mdiTag } from '@mdi/js'
 import { isTagNameValid } from '../../lib/db/utils'
-import { useAnalytics, analyticsEvents } from '../../lib/analytics'
 import { PopulatedTagDoc } from '../../lib/db/types'
 import styled from '../../shared/lib/styled'
 import {
@@ -103,7 +102,6 @@ const TagNavigatorNewTagPopup = ({
 }: TagNavigatorNewTagPopupProps) => {
   const [newTagName, setNewTagName] = useState('')
   const [menuIndex, setMenuIndex] = useState(0)
-  const { report } = useAnalytics()
 
   const trimmedNewTagName = useMemo(() => {
     return newTagName.trim()
@@ -248,7 +246,6 @@ const TagNavigatorNewTagPopup = ({
                 appendTagByName(storageTag.name)
                 setNewTagName('')
                 inputRef.current?.focus()
-                report(analyticsEvents.appendNoteTag)
               }}
             >
               <Icon path={mdiTag} />
@@ -271,8 +268,6 @@ const TagNavigatorNewTagPopup = ({
                 appendTagByName(trimmedNewTagName)
                 setNewTagName('')
                 inputRef.current?.focus()
-                report(analyticsEvents.appendNoteTag)
-                report(analyticsEvents.addTag)
               }}
             >
               <span>Create</span>&nbsp;

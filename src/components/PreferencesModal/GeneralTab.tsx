@@ -2,14 +2,12 @@ import React, { useCallback } from 'react'
 import { SectionHeader } from './styled'
 import { usePreferences } from '../../lib/preferences'
 import { useTranslation } from 'react-i18next'
-import { useAnalytics, analyticsEvents } from '../../lib/analytics'
 import { getNoteSortingOptionLabel, noteSortingOptions } from '../../lib/sort'
 import { SimpleFormSelect } from '../../shared/components/molecules/Form/atoms/FormSelect'
 import Form from '../../shared/components/molecules/Form'
 
 const GeneralTab = () => {
   const { preferences, setPreferences } = usePreferences()
-  const { report } = useAnalytics()
   const { t } = useTranslation()
 
   const selectTheme = useCallback(
@@ -17,9 +15,8 @@ const GeneralTab = () => {
       setPreferences({
         'general.theme': value,
       })
-      report(analyticsEvents.updateUiTheme)
     },
-    [setPreferences, report]
+    [setPreferences]
   )
 
   const selectNoteSorting = useCallback(
