@@ -1,15 +1,9 @@
-import { JsonObject, Except } from 'type-fest'
+import { JsonObject } from 'type-fest'
 import FSNoteDb from './FSNoteDb'
 
 export type ObjectMap<T> = {
   [key: string]: T | undefined
 }
-
-/**
- * DB Types
- */
-
-export type ExceptRev<D extends PouchDB.Core.RevisionIdMeta> = Except<D, '_rev'>
 
 export interface FSNoteStorageData {
   id: string
