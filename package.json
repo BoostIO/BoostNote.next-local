@@ -25,7 +25,8 @@
     "test": "npm run lint && npm run test-api",
     "test-api": "jest -c jest.json",
     "test-api:watch": "jest -c jest.json --watch",
-    "tsc": "tsc --watch --noEmit"
+    "tsc": "tsc --watch --noEmit",
+    "ico": "png2icons static/logo.png static/icon -allwe"
   },
   "keywords": [
     "markdown",
@@ -202,7 +203,7 @@
     "asar": false,
     "afterSign": "build-utils/afterSignHook.js",
     "mac": {
-      "icon": "static/icon.icns",
+      "icon": "static/mac-logo.png",
       "hardenedRuntime": true,
       "entitlementsInherit": "macOs/entitlements.mac.plist",
       "entitlements": "macOs/entitlements.mac.plist"

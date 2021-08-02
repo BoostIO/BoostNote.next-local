@@ -1,17 +1,23 @@
 <div align="center">
-  <img src="static/logo_with_text_teal.svg" width="400">
-
-[https://boostnote.io/](https://boostnote.io/)
-
+  <h1><img src="static/logo.svg" width="30"> Boost Note.next Local</h1>
 </div>
 
-![uiimage](./static/img_ui.png)
+Standalone app separated from BoostNote.next for better local space support.
 
-<h2 align='center'>A collaborative real-time markdown note app for developer teams</h2>
-
-<br />
-
-BoostNote.next is a renewal of the [Boostnote app](https://github.com/BoostIO/Boostnote).
+> ## Boost Note.next
+>
+> If you want a collaborative app, please try Boost Note.next.(https://boostnote.io)
+>
+> ![uiimage](./static/img_ui.png)
+>
+> <h2 align='center'>A collaborative real-time markdown note app for developer teams</h2>
+>
+> ## Support Platform
+>
+> - [Web app](https://boostnote.io)
+> - [Desktop app](https://boostnote.io/#download)
+> - [iOS app](https://apps.apple.com/gb/app/boost-note-mobile/id1576176505)
+> - [Android app](https://play.google.com/store/apps/details?id=com.boostio.boostnote2021)
 
 ## Authors & Maintainers
 
@@ -21,26 +27,18 @@ BoostNote.next is a renewal of the [Boostnote app](https://github.com/BoostIO/Bo
 ## Community
 
 - [Forum (New!)](https://forum.boostnote.io/)
-- [Release Notes](https://forum.boostnote.io/c/announcements/5)
 - [Twitter](https://twitter.com/boostnoteapp)
 - [Slack Group](https://join.slack.com/t/boostnote-group/shared_invite/zt-cun7pas3-WwkaezxHBB1lCbUHrwQLXw)
 - [Blog](https://medium.com/boostnote)
 - [Reddit](https://www.reddit.com/r/Boostnote/)
 
-## App
-- [Desktop app](https://boostnote.io/#download)
-- [iOS](https://apps.apple.com/gb/app/boost-note-mobile/id1576176505)
-- [Android](https://play.google.com/store/apps/details?id=com.boostio.boostnote2021)
-
 ## Development
 
 ### Folder structure
 
-- `android` : Android app project. Please open with Android Studio.
 - `dist` : Bundled electron app stuff. All executable and installable of the electron app are generated in this folder. You can generate this by `npm run prepack`, `npm run pack`, and `npm run release` scripts.
 - `compiled` : Compiled web app resources from `npm run build` script. The resources are for deploying the web app.
 - `electron` : Compiled electron resources from `npm run build:electron` script. You can run it by `npm start` script. The resources are for packaging the electron app.
-- `ios` : iOS app project. Please open with XCode.
 - `src` : Source code.
 
 ### Build
