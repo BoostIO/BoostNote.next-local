@@ -8,7 +8,7 @@ module.exports = async function (params) {
     return
   }
 
-  const appId = 'com.boostio.boostnote'
+  const appId = 'com.boostio.boostnote-local'
 
   const appPath = path.join(
     params.appOutDir,
