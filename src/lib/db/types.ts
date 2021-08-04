@@ -37,7 +37,7 @@ export type NoteDoc = {
 
 export type FolderDoc = {
   _id: string // folder:${FOLDER_PATHNAME}
-  _realId: string // identification for reordering (unique across any property change)
+  orderId: string // identification for reordering (unique across any property change)
   createdAt: string
   updatedAt: string
   _rev?: string

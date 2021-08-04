@@ -130,7 +130,7 @@ function getFolderChildrenOrderedIds(
   folders.forEach((folder) => {
     const folderPathname = getFolderPathname(folder._id)
     if (isDirectSubPathname(parentFolderPathname, folderPathname)) {
-      children.push(folder._realId)
+      children.push(folder.orderId)
     }
   })
 
@@ -218,7 +218,7 @@ export function mapTree(
   const items = new Map<string, LocalTreeItem>()
   const [notes, folders] = [values(docMap), values(folderMap)]
   folders.forEach((folder) => {
-    const folderRealId = folder._realId
+    const folderOrderId = folder.orderId
     const folderId = folder._id
     const folderPathname = getFolderPathname(folderId)
     if (folderPathname == '/') {
@@ -230,14 +230,14 @@ export function mapTree(
     const parentFolderDoc = folderMap[parentFolderPathname]
     const parentFolderId =
       parentFolderDoc != null && parentFolderPathname != '/'
-        ? parentFolderDoc._realId
+        ? parentFolderDoc.orderId
         : workspace.id
-    items.set(folderRealId, {
-      id: folderRealId,
+    items.set(folderOrderId, {
+      id: folderOrderId,
       lastUpdated: folder.updatedAt,
       label: folderName,
-      folded: !sideBarOpenedFolderIdsSet.has(folderRealId),
-      folding: getFoldEvents('folders', folderRealId),
+      folded: !sideBarOpenedFolderIdsSet.has(folderOrderId),
+      folding: getFoldEvents('folders', folderOrderId),
       href,
       active: href === currentPathWithWorkspace,
       navigateTo: () => push(href),
@@ -341,7 +341,7 @@ export function mapTree(
       parentFolderDoc != null
         ? parentFolderDoc.pathname == '/'
           ? workspace.id
-          : parentFolderDoc._realId
+          : parentFolderDoc.orderId
         : workspace.id
     items.set(noteId, {
       id: noteId,
