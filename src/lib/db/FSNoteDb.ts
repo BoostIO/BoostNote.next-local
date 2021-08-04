@@ -92,8 +92,8 @@ class FSNoteDb implements NoteDb {
     const allFolders = await this.getAllFolders()
     let anyFolderDocUpdated = false
     allFolders.forEach((folderDoc) => {
-      if (folderDoc._realId === undefined) {
-        folderDoc._realId = generateFolderId()
+      if (folderDoc.orderId === undefined) {
+        folderDoc.orderId = generateFolderId()
         anyFolderDocUpdated = true
       }
     })
@@ -122,7 +122,7 @@ class FSNoteDb implements NoteDb {
   async upsertFolder(
     pathname: string,
     props?: Partial<FolderDocEditibleProps>,
-    oldRealId?: string,
+    oldOrderId?: string,
     skipParentFolderCreation?: boolean
   ): Promise<FolderDoc> {
     if (!isFolderPathnameValid(pathname)) {
@@ -139,15 +139,15 @@ class FSNoteDb implements NoteDb {
       return folder
     }
     const now = getNow()
-    const newRealId =
-      folder != null && folder._realId != null ? folder._realId : oldRealId
+    const newOrderId =
+      folder != null && folder.orderId != null ? folder.orderId : oldOrderId
     const newFolderDoc = {
       ...(folder || {
         _id: getFolderId(pathname),
         createdAt: now, // todo: [komediruzecki-10/07/2021] FIXME: should be updated at when renaming folder!
         data: {},
       }),
-      _realId: newRealId != null ? newRealId : generateFolderId(),
+      orderId: newOrderId != null ? newOrderId : generateFolderId(),
       ...props,
       orderedIds: removeDuplicates([
         ...(props != null ? props.orderedIds || [] : []),
@@ -185,7 +185,7 @@ class FSNoteDb implements NoteDb {
     const folderToDelete = await this.getFolder(pathname)
     if (parentFolder != null && folderToDelete != null) {
       const newParentOrderedIds = (parentFolder.orderedIds || []).filter(
-        (orderId) => orderId != folderToDelete._realId
+        (orderId) => orderId != folderToDelete.orderId
       )
       newFolderMap[getParentFolderPathname(pathname)] = {
         ...parentFolder,
@@ -597,14 +597,14 @@ class FSNoteDb implements NoteDb {
     for (const folderPathname of allFoldersToRename) {
       const newFolderPathname = replacePathname(folderPathname)
       const oldFolderDoc = await this.getFolder(folderPathname)
-      const oldRealId = oldFolderDoc != null ? oldFolderDoc._realId : undefined
+      const oldOrderId = oldFolderDoc != null ? oldFolderDoc.orderId : undefined
       const newFolder = await this.upsertFolder(
         newFolderPathname,
         {
           orderedIds:
             oldFolderDoc != null ? oldFolderDoc.orderedIds : undefined,
         },
-        oldRealId,
+        oldOrderId,
         true
       )
       updatedFolderMap.set(newFolderPathname, {
@@ -625,7 +625,7 @@ class FSNoteDb implements NoteDb {
       if (previousParentFolder != null && newParentFolder != null) {
         const newPreviousParentOrderedIds = removeDuplicates(
           (previousParentFolder.orderedIds || []).filter(
-            (orderId) => folder._realId != orderId
+            (orderId) => folder.orderId != orderId
           )
         )
 
@@ -634,7 +634,7 @@ class FSNoteDb implements NoteDb {
         // new parent folder update
         const newParentOrderedIds = removeDuplicates([
           ...(newParentFolder.orderedIds || []),
-          folder._realId,
+          folder.orderId,
         ])
         const newParentFolderPathname = getParentFolderPathname(newPathname)
 
@@ -694,7 +694,7 @@ class FSNoteDb implements NoteDb {
     )
     updatedFolderMap.forEach((updatedFolderDoc) => {
       const {
-        _realId,
+        orderId,
         _id,
         createdAt,
         updatedAt,
@@ -702,7 +702,7 @@ class FSNoteDb implements NoteDb {
         orderedIds,
       } = updatedFolderDoc
       newFolderMap[updatedFolderDoc.pathname] = {
-        _realId,
+        orderId: orderId,
         _id,
         createdAt,
         updatedAt,

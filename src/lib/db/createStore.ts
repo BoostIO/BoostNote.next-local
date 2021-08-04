@@ -345,7 +345,7 @@ export function createDbStoreCreator(
           const previousOrderedIds = parentFolder.orderedIds || []
           const newOrderedIds = removeDuplicates([
             ...previousOrderedIds,
-            aFolder._realId,
+            aFolder.orderId,
           ])
           const updatedFolder = await storage.db.upsertFolder(
             parentFolder.pathname,
@@ -905,7 +905,7 @@ export function createDbStoreCreator(
           const previousOrderedIds = parentFolder.orderedIds || []
           const newOrderedIds = removeDuplicates([
             ...previousOrderedIds,
-            folder._realId,
+            folder.orderId,
           ])
 
           const updatedParentFolder = await storage.db.updateFolderOrderedIds(
@@ -1407,7 +1407,7 @@ async function prepareStorage(
         const subFolderDoc = populatedFolderMap[subFolderPathname]
         if (subFolderDoc != null) {
           populatedFolderMap[parentFolderPathname]!.orderedIds!.push(
-            subFolderDoc._realId
+            subFolderDoc.orderId
           )
         }
       })

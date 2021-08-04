@@ -4,7 +4,7 @@ import { DraggedTo, SidebarDragState } from '../../shared/lib/dnd'
 
 export function getResourceId(source: NavResource) {
   if (source.type == 'folder') {
-    return source.result._realId
+    return source.result.orderId
   } else {
     return source.result._id
   }
