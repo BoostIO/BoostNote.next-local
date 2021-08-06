@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from '../../lib/router'
 import { useDb } from '../../lib/db'
@@ -69,13 +69,11 @@ const FSStorageCreateForm = () => {
                 <ButtonGroup>
                   <FormFolderSelectorInput
                     type='text'
-                    onClick={openDialogAndStoreLocation}
-                    readOnly
-                    value={
-                      location.trim().length === 0
-                        ? t('folder.noLocationSelected')
-                        : location
-                    }
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setLocation(event.target.value)
+                    }}
+                    placeholder={t('folder.noLocationSelected')}
+                    value={location}
                   />
                   <FormFolderSelectButtonContainer>
                     <Button
