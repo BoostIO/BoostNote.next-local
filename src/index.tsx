@@ -16,7 +16,6 @@ import { PreviewStyleProvider } from './lib/preview'
 import { StorageRouterProvider } from './lib/storageRouter'
 import { SearchModalProvider } from './lib/searchModal'
 import { CheckedFeaturesProvider } from './lib/checkedFeatures'
-import { CloudIntroModalProvider } from './lib/cloudIntroModal'
 import { DialogProvider } from './lib/dialog'
 
 const V2CombinedProvider = combineProviders(
@@ -38,8 +37,7 @@ const CombinedProvider = combineProviders(
   PreferencesProvider,
   StorageRouterProvider,
   RouterProvider,
-  CheckedFeaturesProvider,
-  CloudIntroModalProvider
+  CheckedFeaturesProvider
 )
 
 function render(Component: typeof App) {

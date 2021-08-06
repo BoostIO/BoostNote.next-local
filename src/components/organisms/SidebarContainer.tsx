@@ -16,7 +16,7 @@ import {
   StorageTagsRouteParams,
   useRouteParams,
 } from '../../lib/routeParams'
-import { mdiCloudOffOutline, mdiCog, mdiMagnify } from '@mdi/js'
+import { mdiCog, mdiMagnify } from '@mdi/js'
 import { noteDetailFocusTitleInputEventEmitter } from '../../lib/events'
 import { useTranslation } from 'react-i18next'
 import { useSearchModal } from '../../lib/searchModal'
@@ -30,7 +30,6 @@ import { useLocalDB } from '../../lib/v2/hooks/local/useLocalDB'
 import { useLocalDnd } from '../../lib/v2/hooks/local/useLocalDnd'
 import { CollapsableType } from '../../lib/v2/stores/sidebarCollapse'
 import { useSidebarCollapse } from '../../lib/v2/stores/sidebarCollapse'
-import { useCloudIntroModal } from '../../lib/cloudIntroModal'
 import { mapLocalSpace } from '../../lib/v2/mappers/local/sidebarSpaces'
 import { SidebarSpace } from '../../shared/components/organisms/Sidebar/molecules/SidebarSpaces'
 import NewDocButton from '../molecules/NewDocButton'
@@ -75,10 +74,6 @@ const SidebarContainer = ({
   const { draggedResource, dropInDocOrFolder } = useLocalDnd()
   const { generalStatus, setGeneralStatus } = useGeneralStatus()
   const [showSpaces, setShowSpaces] = useState(false)
-  const {
-    toggleShowingCloudIntroModal,
-    showingCloudIntroModal,
-  } = useCloudIntroModal()
   const [initialLoadDone] = useState(true)
   const {
     sideBarOpenedLinksIdsSet,
@@ -476,23 +471,6 @@ const SidebarContainer = ({
     workspace,
   ])
 
-  const sidebarFooter = useMemo(() => {
-    return (
-      <SidebarButtonList
-        rows={[
-          {
-            label: 'Cloud Intro',
-            active: showingCloudIntroModal,
-            icon: mdiCloudOffOutline,
-            variant: 'subtle',
-            labelClick: () => toggleShowingCloudIntroModal(),
-            id: 'sidebar__button__cloud',
-          },
-        ]}
-      />
-    )
-  }, [showingCloudIntroModal, toggleShowingCloudIntroModal])
-
   return (
     <NavigatorContainer onContextMenu={openStorageContextMenu}>
       <Sidebar
@@ -504,7 +482,6 @@ const SidebarContainer = ({
         tree={tree}
         sidebarResize={sidebarResize}
         header={sidebarHeader}
-        treeBottomRows={sidebarFooter}
       />
     </NavigatorContainer>
   )
