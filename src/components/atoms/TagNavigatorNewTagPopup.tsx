@@ -173,7 +173,6 @@ const TagNavigatorNewTagPopup = ({
           if (menuIndex < filteredStorageTags.length) {
             setNewTagName('')
             appendTagByName(filteredStorageTags[menuIndex].name)
-            close()
             return
           }
 
@@ -182,7 +181,6 @@ const TagNavigatorNewTagPopup = ({
             if (isTagNameValid(trimmedNewTagName)) {
               appendTagByName(trimmedNewTagName)
             }
-            close()
             return
           }
           break
