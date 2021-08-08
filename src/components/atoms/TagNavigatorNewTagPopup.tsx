@@ -133,7 +133,7 @@ const TagNavigatorNewTagPopup = ({
       return availableTagNames
     }
     return availableTagNames.filter((tagDoc) => {
-      return tagDoc.name.includes(newTagName)
+      return tagDoc.name.toLowerCase().includes(newTagName.toLowerCase())
     })
   }, [newTagNameIsEmpty, availableTagNames, newTagName])
 
