@@ -40,10 +40,6 @@ export function getTemplateFromKeymap(
               },
               { type: 'separator' },
               {
-                label: 'Add Cloud Space',
-                click: createEmitIpcMenuItemHandler('create-cloud-space'),
-              },
-              {
                 label: 'Add Local Space',
                 click: createEmitIpcMenuItemHandler('create-local-space'),
               },
@@ -111,10 +107,6 @@ export function getTemplateFromKeymap(
               accelerator: keymap.get('editorSaveAs'),
             },
             { type: 'separator' },
-            {
-              label: 'Add Cloud Space',
-              click: createEmitIpcMenuItemHandler('create-cloud-space'),
-            },
             {
               label: 'Add Local Space',
               click: createEmitIpcMenuItemHandler('create-local-space'),
@@ -319,7 +311,7 @@ export function getTemplateFromKeymap(
           label: 'GitHub',
           click: async () => {
             await shell.openExternal(
-              'https://github.com/BoostIO/Boostnote.next'
+              'https://github.com/BoostIO/BoostNote.next-local'
             )
           },
         },
@@ -367,7 +359,7 @@ export function getTemplateFromKeymap(
         {
           label: 'Learn More',
           click: async () => {
-            await shell.openExternal('https://boosthub.io')
+            await shell.openExternal('https://boostnote.io/')
           },
         },
       ] as MenuItemConstructorOptions[],

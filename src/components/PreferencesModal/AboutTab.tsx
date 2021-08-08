@@ -140,7 +140,7 @@ const AboutTab = () => {
             <div className='about-community-links'>
               <ul>
                 <li>
-                  <PrimaryLink href='https://github.com/BoostIO/BoostNote.next'>
+                  <PrimaryLink href='https://github.com/BoostIO/BoostNote.next-local'>
                     {t('about.github')}
                   </PrimaryLink>
                 </li>
