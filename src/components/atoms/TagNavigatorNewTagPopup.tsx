@@ -233,9 +233,28 @@ const TagNavigatorNewTagPopup = ({
         onKeyDown={handleKeyInput}
         autoComplete='off'
       />
-      {filteredStorageTags.length > 0 && (
-        <div className='autocomplete__container'>
-          {filteredStorageTags.map((storageTag, index) => (
+      <div className='autocomplete__container'>
+        {!newTagNameIsEmpty &&
+          !tagSet.has(trimmedNewTagName) &&
+          !storageTagMap.has(trimmedNewTagName) && (
+            <MenuButton
+              className={cc([
+                menuIndex === filteredStorageTags.length ? 'active' : '',
+                'autocomplete__option',
+              ])}
+              onClick={() => {
+                appendTagByName(trimmedNewTagName)
+                setNewTagName('')
+                inputRef.current?.focus()
+              }}
+            >
+              <span>Create</span>&nbsp;
+              <Icon path={mdiTag} />
+              <span>{newTagName}</span>
+            </MenuButton>
+          )}
+        {filteredStorageTags.length > 0 &&
+          filteredStorageTags.map((storageTag, index) => (
             <MenuButton
               key={storageTag.name}
               className={cc([
@@ -252,30 +271,7 @@ const TagNavigatorNewTagPopup = ({
               <span>{storageTag.name}</span>
             </MenuButton>
           ))}
-        </div>
-      )}
-
-      {!newTagNameIsEmpty &&
-        !tagSet.has(trimmedNewTagName) &&
-        !storageTagMap.has(trimmedNewTagName) && (
-          <div className='autocomplete__container'>
-            <MenuButton
-              className={cc([
-                menuIndex === filteredStorageTags.length ? 'active' : '',
-                'autocomplete__option',
-              ])}
-              onClick={() => {
-                appendTagByName(trimmedNewTagName)
-                setNewTagName('')
-                inputRef.current?.focus()
-              }}
-            >
-              <span>Create</span>&nbsp;
-              <Icon path={mdiTag} />
-              <span>{newTagName}</span>
-            </MenuButton>
-          </div>
-        )}
+      </div>
 
       {tags.includes(trimmedNewTagName) && (
         <MenuButton disabled={true}>
