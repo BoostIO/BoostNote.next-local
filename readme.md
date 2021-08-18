@@ -22,7 +22,7 @@ Standalone app separated from BoostNote.next for better local space support.
 ## Authors & Maintainers
 
 - [Rokt33r](https://github.com/rokt33r)
-- [Komediruzecki](https://github.com/Komediruzecki)
+- [Komediruzecki](https://github.com/Komediruzecki) ([buy me a coffee](https://www.buymeacoffee.com/komediruzecki))
 
 ## Community
 
