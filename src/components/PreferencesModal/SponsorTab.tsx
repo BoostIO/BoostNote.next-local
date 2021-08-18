@@ -2,6 +2,7 @@ import React from 'react'
 import { SectionHeader } from './styled'
 import Button from '../../shared/components/atoms/Button'
 import { openNew } from '../../lib/platform'
+import Image from '../atoms/Image'
 
 const SponsorTab = () => {
   return (
@@ -13,15 +14,16 @@ const SponsorTab = () => {
       </p>
       <div>
         <Button
-          onClick={() => openNew('https://buy.stripe.com/fZe01ZauD6M13U4fYY')}
+          onClick={() => openNew('https://www.buymeacoffee.com/komediruzecki ')}
         >
-          $30 / One Time
+          Komediruzecki - buy me a coffee
         </Button>
-        <Button
-          onClick={() => openNew('https://buy.stripe.com/14k1630U3eet62caEF')}
-        >
-          $50 / One Time
-        </Button>
+      </div>
+      <div>
+        <Image
+          style={{ marginLeft: 0, width: '420px', paddingTop: '1em' }}
+          src={'/app/static/komediruzecki-buymeacoffee-com.png'}
+        />
       </div>
     </div>
   )
