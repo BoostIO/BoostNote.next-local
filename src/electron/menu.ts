@@ -40,10 +40,6 @@ export function getTemplateFromKeymap(
               },
               { type: 'separator' },
               {
-                label: 'Add Cloud Space',
-                click: createEmitIpcMenuItemHandler('create-cloud-space'),
-              },
-              {
                 label: 'Add Local Space',
                 click: createEmitIpcMenuItemHandler('create-local-space'),
               },
@@ -111,10 +107,6 @@ export function getTemplateFromKeymap(
               accelerator: keymap.get('editorSaveAs'),
             },
             { type: 'separator' },
-            {
-              label: 'Add Cloud Space',
-              click: createEmitIpcMenuItemHandler('create-cloud-space'),
-            },
             {
               label: 'Add Local Space',
               click: createEmitIpcMenuItemHandler('create-local-space'),
@@ -290,10 +282,10 @@ export function getTemplateFromKeymap(
         { role: 'forcereload' },
         { role: 'toggledevtools' },
         { type: 'separator' },
-        // { role: 'resetzoom' },
-        // { role: 'zoomin' },
-        // { role: 'zoomout' },
-        // { type: 'separator' },
+        { role: 'resetzoom' },
+        { role: 'zoomin' },
+        { role: 'zoomout' },
+        { type: 'separator' },
         { role: 'togglefullscreen' },
       ] as MenuItemConstructorOptions[],
     },
@@ -301,7 +293,6 @@ export function getTemplateFromKeymap(
       label: 'Window',
       submenu: [
         { role: 'minimize' },
-        { role: 'zoom' },
         ...(mac
           ? [
               { type: 'separator' },
@@ -319,7 +310,7 @@ export function getTemplateFromKeymap(
           label: 'GitHub',
           click: async () => {
             await shell.openExternal(
-              'https://github.com/BoostIO/Boostnote.next'
+              'https://github.com/BoostIO/BoostNote.next-local'
             )
           },
         },
@@ -367,7 +358,7 @@ export function getTemplateFromKeymap(
         {
           label: 'Learn More',
           click: async () => {
-            await shell.openExternal('https://boosthub.io')
+            await shell.openExternal('https://boostnote.io/')
           },
         },
       ] as MenuItemConstructorOptions[],

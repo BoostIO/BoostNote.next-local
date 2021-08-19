@@ -180,6 +180,13 @@ const PreferencesModal = () => {
               active={tab === 'about'}
               onClick={() => openTab('about')}
             />
+            {currentStorage !== null && (
+              <SettingNavButtonItem
+                label='Space'
+                active={tab === 'storage'}
+                onClick={() => openTab('storage')}
+              />
+            )}
             <SettingNavButtonItem
               label={t('preferences.keymap')}
               active={tab === 'keymap'}

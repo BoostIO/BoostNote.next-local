@@ -67,7 +67,7 @@ const StorageEditPage = ({ storage }: StorageEditPageProps) => {
   return (
     <div>
       <h2>Space Settings</h2>
-      <p>Location : {storage.location}</p>
+      <p>Location: {storage.location}</p>
 
       <FormLabelGroup>
         <FormLabelGroupLabel>Space Name</FormLabelGroupLabel>
