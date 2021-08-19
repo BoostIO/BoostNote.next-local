@@ -85,7 +85,7 @@ interface PrimaryLinkProps {
   children: string
 }
 
-const PrimaryLink = ({ href, children }: PrimaryLinkProps) => {
+export const PrimaryLink = ({ href, children }: PrimaryLinkProps) => {
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault()
