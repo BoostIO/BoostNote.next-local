@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const { parse } = require('url')
+
 ;(function () {
   if (typeof require === 'undefined') {
     return
@@ -13,8 +15,16 @@
   const isSvg = require('is-svg')
 
   function openExternal(url) {
-    console.log('opening ...', url)
-    electron.shell.openExternal(url)
+    const { protocol } = parse(url)
+    switch (protocol) {
+      case 'http:':
+      case 'https:':
+        console.log('opening ...', url)
+        electron.shell.openExternal(url)
+        return
+      default:
+        console.warn(`${protocol} protocol is not supported`)
+    }
   }
 
   function openPath(fullPath, folderOnly = true) {
