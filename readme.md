@@ -43,17 +43,7 @@ Standalone app separated from BoostNote.next for better local space support.
 
 ### Build
 
-Please copy .env.default file and create a file named `.env` in the root of the project directory, or the build will fail.
-
-#### Web app
-
-```sh
-# Install dependencies
-npm i
-
-# Run webpack and open browser
-npm run dev:cloud
-```
+Please copy `.env.default` file and create a file named `.env` in the root of the project directory, or the build will fail.
 
 #### Electron app
 
