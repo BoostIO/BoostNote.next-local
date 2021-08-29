@@ -16,7 +16,8 @@ const openInternalLink = (link: string) => {
 }
 
 export const openNew = (url: string) => {
-  if (url.length === 0) {
+  if (!url || url.length === 0) {
+    console.warn('Cannot follow invalid URL.')
     return
   }
 
