@@ -2,7 +2,7 @@
   <h1><img src="static/logo.svg" width="30"> Boost Note.next Local</h1>
 </div>
 
-Standalone app separated from BoostNote.next for better local space support.
+Standalone app separated from BoostNote.next for better local space support. See [Roadmap](https://github.com/BoostIO/BoostNote.next-local/discussions/43).
 
 > ## Boost Note.next
 >
@@ -26,7 +26,7 @@ Standalone app separated from BoostNote.next for better local space support.
 
 ## Community
 
-- [Forum (New!)](https://forum.boostnote.io/)
+- [Discussions Forum (New!)](https://github.com/BoostIO/BoostNote.next-local/discussions)
 - [Twitter](https://twitter.com/boostnoteapp)
 - [Slack Group](https://join.slack.com/t/boostnote-group/shared_invite/zt-cun7pas3-WwkaezxHBB1lCbUHrwQLXw)
 - [Blog](https://medium.com/boostnote)
