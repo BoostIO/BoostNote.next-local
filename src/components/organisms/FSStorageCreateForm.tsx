@@ -47,6 +47,8 @@ const FSStorageCreateForm = () => {
       rows={[
         {
           title: t('storage.name'),
+          description:
+            'Please provide your new storage name or name to use for existing space.',
           items: [
             {
               type: 'input',
@@ -62,6 +64,8 @@ const FSStorageCreateForm = () => {
         },
         {
           title: 'Location',
+          description:
+            'Please select new empty folder for your space or chose existing folder where your boostnote.json file resides.',
           items: [
             {
               type: 'node',

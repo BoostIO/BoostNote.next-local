@@ -14,7 +14,7 @@ const StorageCreatePage = () => {
           <>
             <Icon path={mdiBookPlusMultiple} size={16} />
             <span style={{ marginLeft: 10, marginRight: 10 }}>
-              Create Local Space
+              Create or import Local Space
             </span>
           </>
         ),

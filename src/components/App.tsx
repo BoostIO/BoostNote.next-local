@@ -8,7 +8,7 @@ import '../lib/i18n'
 import CodeMirrorStyle from './CodeMirrorStyle'
 import { useEffectOnce } from 'react-use'
 import { useRouter } from '../lib/router'
-import { values, keys } from '../lib/db/utils'
+import { values, keys, size } from '../lib/db/utils'
 import { addIpcListener, removeIpcListener } from '../lib/electronOnly'
 import { useBoostNoteProtocol } from '../lib/protocol'
 import { useStorageRouter } from '../lib/storageRouter'
@@ -103,9 +103,21 @@ const App = () => {
       const storageIds = keys(storageMap)
 
       const targetStorageId = storageIds[index]
-      navigateToStorage(targetStorageId)
+      const spaceCount = size(storageMap)
+      if (index >= spaceCount) {
+        pushMessage({
+          title: 'No such storage.',
+          description: `You selected ${index + 1}${
+            index == 0 ? 'st' : index == 1 ? 'nd' : 'th'
+          } space but only ${spaceCount} space${spaceCount == 1 ? '' : 's'} ${
+            spaceCount > 1 ? 'are' : 'is'
+          } available. Please add more storages or switch to existing ones. `,
+        })
+      } else {
+        navigateToStorage(targetStorageId)
+      }
     },
-    [storageMap, navigateToStorage]
+    [storageMap, navigateToStorage, pushMessage]
   )
 
   useEffect(() => {

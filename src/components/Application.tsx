@@ -180,10 +180,12 @@ const Application = ({
       {storage != null && showSearchModal && <SearchModal storage={storage} />}
       <ApplicationLayout
         sidebar={
-          <SidebarContainer
-            workspace={storage}
-            toggleSearchScreen={() => setShowSearchScreen((prev) => !prev)}
-          />
+          storage != null && (
+            <SidebarContainer
+              workspace={storage}
+              toggleSearchScreen={() => setShowSearchScreen((prev) => !prev)}
+            />
+          )
         }
         pageBody={
           showSearchScreen ? (

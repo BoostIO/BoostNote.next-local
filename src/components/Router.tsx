@@ -5,7 +5,7 @@ import StorageCreatePage from './pages/StorageCreatePage'
 import { useDb } from '../lib/db'
 import AttachmentsPage from './pages/AttachmentsPage'
 import WikiNotePage from './pages/WikiNotePage'
-import { values } from '../lib/db/utils'
+import { size, values } from '../lib/db/utils'
 import ArchivePage from './pages/ArchivePage'
 import LabelsPage from './pages/LabelsPage'
 import TimelinePage from './pages/TimelinePage'
@@ -67,6 +67,11 @@ const Router = () => {
     case 'workspaces.create':
       return <StorageCreatePage />
   }
+
+  if (size(storageMap) == 0) {
+    return <StorageCreatePage />
+  }
+
   return (
     <NotFoundErrorPage
       title={'Page not found'}
