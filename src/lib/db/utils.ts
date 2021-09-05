@@ -23,6 +23,10 @@ export function keys(objectMap: ObjectMap<any>): string[] {
   return Object.keys(objectMap)
 }
 
+export function size(objectMap: ObjectMap<any>): number {
+  return values(objectMap).length
+}
+
 export function getNow(): string {
   return new Date().toISOString()
 }

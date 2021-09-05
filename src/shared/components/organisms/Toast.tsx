@@ -106,7 +106,7 @@ const Container = styled.div`
 
 class ToastItem extends React.Component<ToastItemProps, ToastItemState> {
   state = {
-    remaining: 3000,
+    remaining: 6000,
     timer: 0,
   }
 
