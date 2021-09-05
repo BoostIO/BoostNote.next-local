@@ -196,6 +196,7 @@ function getPrintStyleForExports() {
 pre code {
   white-space: pre-wrap;
 }
+
 </style>
 `
 }
@@ -216,6 +217,26 @@ async function getExportStylesInfo(
   const markdownCodeBlockTheme =
     codeBlockTheme === 'solarized-dark' ? 'solarized' : codeBlockTheme
   const appThemeCss = getGlobalCss(selectV2Theme(generalThemeName))
+  const codemirrorDefaultStylesPathPrefix = dev
+    ? `codemirror/lib/codemirror.css`
+    : `codemirror/theme/codemirror.css`
+  try {
+    const codemirrorDefaultStyles = await readFile(
+      join(cssFileRoot, codemirrorDefaultStylesPathPrefix)
+    )
+    cssStyles.push({
+      filename: 'codemirror.css',
+      content: codemirrorDefaultStyles,
+      cssLink: join(cssLinkRoot, codemirrorDefaultStylesPathPrefix),
+    })
+  } catch (err) {
+    console.warn(
+      `Cannot find asset: ${join(
+        cssFileRoot,
+        codemirrorDefaultStylesPathPrefix
+      )}`
+    )
+  }
 
   if (appThemeCss) {
     cssStyles.push({ filename: 'globalTheme.css', content: appThemeCss })

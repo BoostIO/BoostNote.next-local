@@ -210,14 +210,6 @@ export function createUnprocessableEntityError(message: string) {
   return new DbClientError(message, DbClientErrorCode.UnprocessableEntity)
 }
 
-export function createNotFoundError(message: string) {
-  return new DbClientError(message, DbClientErrorCode.NotFound)
-}
-
-export function createConflictError(message: string) {
-  return new DbClientError(message, DbClientErrorCode.Conflict)
-}
-
 export function getAllParentFolderPathnames(pathname: string) {
   const pathnames = []
   let currentPathname = pathname

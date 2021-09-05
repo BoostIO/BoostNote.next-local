@@ -91,6 +91,8 @@ export const themes = [
   'shadowfox',
   'ttcn',
   'yonce',
+  'ayu-mirage',
+  'ayu-dark',
 ].sort()
 
 export interface EditorPosition {

@@ -72,6 +72,11 @@ scrollbar-height: 8px;
 ::-webkit-scrollbar-button {
   display: none
 }
+
+.CodeMirror {
+  height: 100%;
+}
+
 `
 
 export default createGlobalStyle<BaseTheme>`
