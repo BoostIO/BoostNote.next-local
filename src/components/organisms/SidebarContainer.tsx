@@ -8,7 +8,7 @@ import {
   addIpcListener,
   removeIpcListener,
 } from '../../lib/electronOnly'
-import { values } from '../../lib/db/utils'
+import { getTimelineHref, values } from '../../lib/db/utils'
 import { MenuItemConstructorOptions } from 'electron'
 import { useStorageRouter } from '../../lib/storageRouter'
 import {
@@ -16,7 +16,7 @@ import {
   StorageTagsRouteParams,
   useRouteParams,
 } from '../../lib/routeParams'
-import { mdiCog, mdiMagnify } from '@mdi/js'
+import { mdiClockOutline, mdiCog, mdiMagnify } from '@mdi/js'
 import { noteDetailFocusTitleInputEventEmitter } from '../../lib/events'
 import { useTranslation } from 'react-i18next'
 import { useSearchModal } from '../../lib/searchModal'
@@ -456,6 +456,13 @@ const SidebarContainer = ({
                 labelClick: () => openTab('about'),
                 id: 'sidebar__button__members',
               },
+              {
+                label: 'Timeline',
+                icon: mdiClockOutline,
+                variant: 'transparent',
+                labelClick: () => push(getTimelineHref(workspace)),
+                id: 'sidebar__button__timeline',
+              },
             ]}
           >
             <NewDocButton workspace={workspace} />
@@ -466,6 +473,7 @@ const SidebarContainer = ({
   }, [
     activeSpace,
     openTab,
+    push,
     sidebarHeaderControls,
     toggleSearchScreen,
     workspace,
