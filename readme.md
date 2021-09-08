@@ -1,12 +1,12 @@
 <div align="center">
-  <h1><img src="static/logo.svg" width="30"> Boost Note.next Local</h1>
+  <h1><img src="static/logo.svg" width="30"> Boost Note Local</h1>
 </div>
 
-Standalone app separated from BoostNote.next for better local space support. See [Roadmap](https://github.com/BoostIO/BoostNote.next-local/discussions/43).
+Standalone app separated from Boost Note for better local space support. See [Roadmap](https://github.com/BoostIO/BoostNote.next-local/discussions/43).
 
-> ## Boost Note.next
+> ## Boost Note
 >
-> If you want a collaborative app, please try Boost Note.next.(https://boostnote.io)
+> If you want a collaborative app, please try Boost Note.(https://github.com/BoostIO/BoostNote-App)
 >
 > ![uiimage](./static/img_ui.png)
 >
