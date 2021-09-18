@@ -15,7 +15,7 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 
 ## [Released]
 
-## [0.22.2] - 2021-09-18
+## [0.22.3] - 2021-09-18
 
 ### Added
 
@@ -36,6 +36,7 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Updater message title and descriptions
 - PDF export themes not being consistent with HTML (also add missing CodeMirror default theme)
 - Archive and restore of the note in Drag and Drop view
+- Trashing note from same folder and then trashing sub-folder note would render incomplete view before refresh
 - Reload/Archive bug
 
 ### Changed
