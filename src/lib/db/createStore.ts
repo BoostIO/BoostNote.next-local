@@ -1353,11 +1353,10 @@ async function prepareStorage(
   const populatedFolderMap = entries(folderMap).reduce<
     ObjectMap<PopulatedFolderDoc>
   >((map, [pathname, folderDoc]) => {
-    if (folderDoc.orderedIds == null) {
+    if (folderDoc.orderedIds == null || folderDoc.orderedIds.length === 0) {
       folderDoc.orderedIds = []
-      foldersToUpdateOrderedIds.push(pathname)
     }
-
+    foldersToUpdateOrderedIds.push(pathname)
     map[pathname] = {
       ...folderDoc,
       pathname,
@@ -1425,12 +1424,14 @@ async function prepareStorage(
       populatedFolderMap[parentFolderPathname]!.orderedIds!
     )
   })
-  foldersToUpdateOrderedIds.forEach((folderPathname) => {
+
+  for (const folderPathname of foldersToUpdateOrderedIds) {
     const folderDoc = populatedFolderMap[folderPathname]
     if (folderDoc != null && folderDoc.orderedIds != null) {
-      db.updateFolderOrderedIds(folderDoc._id, folderDoc.orderedIds)
+      await db.updateFolderOrderedIds(folderDoc._id, folderDoc.orderedIds)
     }
-  })
+  }
+
   return {
     id,
     name,
