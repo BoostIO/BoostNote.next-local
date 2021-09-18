@@ -877,8 +877,12 @@ export function createDbStoreCreator(
         const parentFolderPathnames = getAllParentFolderPathnames(
           noteDoc.folderPathname
         )
-        const foldersToUpdate: PopulatedFolderDoc[] = []
-        const foldersToUpdateParentOrderedIds: PopulatedFolderDoc[] = [folder]
+
+        const isRootFolder = folder.pathname == '/'
+        const foldersToUpdate: PopulatedFolderDoc[] = [folder]
+        const foldersToUpdateParentOrderedIds: PopulatedFolderDoc[] = isRootFolder
+          ? []
+          : [folder]
         for (const parentFolderPathname of parentFolderPathnames) {
           if (storage.folderMap[parentFolderPathname] == null) {
             const missingFolder = await storage.db.upsertFolder(
