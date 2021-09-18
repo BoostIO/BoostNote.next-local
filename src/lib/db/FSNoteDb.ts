@@ -544,6 +544,7 @@ class FSNoteDb implements NoteDb {
     newFolderMap[folderPathname] = {
       ...folder,
       orderedIds: orderedIds,
+      updatedAt: getNow(),
     }
 
     this.data!.folderMap = newFolderMap

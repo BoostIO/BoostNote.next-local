@@ -859,7 +859,7 @@ export function createDbStoreCreator(
         }
         const noteDoc = await storage.db.untrashNote(noteId)
 
-        const folder: PopulatedFolderDoc =
+        const noteFolder: PopulatedFolderDoc =
           storage.folderMap[noteDoc.folderPathname] == null
             ? ({
                 ...(await storage.db.upsertFolder(noteDoc.folderPathname)),
@@ -878,11 +878,12 @@ export function createDbStoreCreator(
           noteDoc.folderPathname
         )
 
-        const isRootFolder = folder.pathname == '/'
-        const foldersToUpdate: PopulatedFolderDoc[] = [folder]
-        const foldersToUpdateParentOrderedIds: PopulatedFolderDoc[] = isRootFolder
-          ? []
-          : [folder]
+        const isFolderMissing =
+          storage.folderMap[noteDoc.folderPathname] == null
+        const foldersToUpdate: PopulatedFolderDoc[] = []
+        const foldersToUpdateParentOrderedIds: PopulatedFolderDoc[] = isFolderMissing
+          ? [noteFolder]
+          : []
         for (const parentFolderPathname of parentFolderPathnames) {
           if (storage.folderMap[parentFolderPathname] == null) {
             const missingFolder = await storage.db.upsertFolder(
@@ -892,7 +893,7 @@ export function createDbStoreCreator(
             const missingFolderPopulatedDoc = {
               ...missingFolder,
               pathname: parentFolderPathname,
-              noteIdSet: new Set(),
+              orderedIds: [],
             } as PopulatedFolderDoc
             foldersToUpdate.push(missingFolderPopulatedDoc)
             foldersToUpdateParentOrderedIds.push(missingFolderPopulatedDoc)
@@ -946,10 +947,16 @@ export function createDbStoreCreator(
           return acc
         }, {})
 
+        // update note doc folder ordered IDs
+        await storage.db.updateFolderOrderedIds(
+          noteFolder._id,
+          noteFolder.orderedIds || []
+        )
+
         setStorageMap(
           produce((draft: ObjectMap<NoteStorage>) => {
             draft[storageId]!.noteMap[noteDoc._id] = noteDoc
-            draft[storageId]!.folderMap[noteDoc.folderPathname] = folder
+            draft[storageId]!.folderMap[noteDoc.folderPathname] = noteFolder
             foldersToUpdate.forEach((folderToUpdate) => {
               draft[storageId]!.folderMap[
                 folderToUpdate.pathname
