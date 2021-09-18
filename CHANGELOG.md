@@ -9,7 +9,13 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 
 ## [Unreleased]
 
-## [0.21.2] - 2021-09-10
+## [0.23.0] - 2021-10-20
+
+### TBA
+
+## [Released]
+
+## [0.22.2] - 2021-09-18
 
 ### Added
 
@@ -29,6 +35,8 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Navigating to invalid spaces (push message instead of 404 page)
 - Updater message title and descriptions
 - PDF export themes not being consistent with HTML (also add missing CodeMirror default theme)
+- Archive and restore of the note in Drag and Drop view
+- Reload/Archive bug
 
 ### Changed
 
@@ -37,8 +45,6 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 ### Removed
 
 - Cloud specific menu items
-
-## [Released]
 
 ## [0.21.1] - 2021-08-06
 
