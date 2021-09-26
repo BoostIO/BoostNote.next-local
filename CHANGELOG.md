@@ -11,11 +11,17 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 
 ## [0.23.0] - 2021-10-20
 
-### TBA
+### Added
+
+- The welcome note on space creation or import
+
+### Fixed
+
+- Space navigation on space remove (defaults to first available space)
 
 ## [Released]
 
-## [0.22.3] - 2021-09-18
+## [0.22.3] - 2021-09-24
 
 ### Added
 

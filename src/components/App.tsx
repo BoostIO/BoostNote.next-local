@@ -106,12 +106,12 @@ const App = () => {
       const spaceCount = size(storageMap)
       if (index >= spaceCount) {
         pushMessage({
-          title: 'No such storage.',
+          title: 'No such space.',
           description: `You selected ${index + 1}${
             index == 0 ? 'st' : index == 1 ? 'nd' : 'th'
           } space but only ${spaceCount} space${spaceCount == 1 ? '' : 's'} ${
             spaceCount > 1 ? 'are' : 'is'
-          } available. Please add more storages or switch to existing ones. `,
+          } available. Please add more spaces or switch to existing ones. `,
         })
       } else {
         navigateToStorage(targetStorageId)

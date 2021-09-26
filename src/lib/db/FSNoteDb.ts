@@ -41,6 +41,7 @@ import {
   unlinkFile,
 } from '../electronOnly'
 import { removeDuplicates } from '../../shared/lib/utils/array'
+import { welcomeNote } from '../templates/welcomeNote'
 
 interface StorageJSONData {
   folderMap: ObjectMap<FolderDoc>
@@ -60,7 +61,7 @@ class FSNoteDb implements NoteDb {
     this.location = location
   }
 
-  async init(): Promise<void> {
+  async init(newStorage?: boolean): Promise<void> {
     await prepareDirectory(this.location)
     await prepareDirectory(this.getNotesFolderPathname())
     await prepareDirectory(this.getAttachmentsFolderPathname())
@@ -82,6 +83,10 @@ class FSNoteDb implements NoteDb {
       })
     }
 
+    if (newStorage) {
+      notes.push(await this.createNote(welcomeNote))
+    }
+
     await Promise.all([
       ...[...missingFolderPathnameSet].map((pathname) =>
         this.upsertFolder(pathname)
@@ -97,7 +102,7 @@ class FSNoteDb implements NoteDb {
         anyFolderDocUpdated = true
       }
     })
-    if (anyFolderDocUpdated) {
+    if (anyFolderDocUpdated || newStorage) {
       await this.saveBoostNoteJSON()
     }
   }
