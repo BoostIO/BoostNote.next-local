@@ -1,3 +1,5 @@
+import React from 'react'
+
 export interface ModalElement {
   title?: React.ReactNode
   content: React.ReactNode

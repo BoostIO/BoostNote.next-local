@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { usePreferences } from '../../lib/preferences'
 import { usePreviewStyle } from '../../lib/preview'
 import { mapTopBarTree } from '../../lib/v2/mappers/local/topbarTree'
-import { useLocalUI } from '../../lib/v2/hooks/local/useLocalUI'
+import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
 import {
   addIpcListener,
   getPathByName,
@@ -181,6 +181,13 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
     selectPreviewMode,
   ])
 
+  const focusTitle = useCallback(() => {
+    if (note == null || storage == null) {
+      return
+    }
+    openRenameDocForm(storage.id, note)
+  }, [note, openRenameDocForm, storage])
+
   useEffect(() => {
     addIpcListener('toggle-preview-mode', togglePreviewMode)
     return () => {
@@ -202,6 +209,13 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
       removeIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
     }
   }, [toggleSplitEditMode])
+
+  useEffect(() => {
+    addIpcListener('focus-title', focusTitle)
+    return () => {
+      removeIpcListener('focus-title', focusTitle)
+    }
+  }, [focusTitle])
 
   const includeFrontMatter = preferences['markdown.includeFrontMatter']
 

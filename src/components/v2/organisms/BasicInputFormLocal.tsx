@@ -16,6 +16,7 @@ interface EmojiInputFormProps {
     spinning?: boolean
   }
   onSubmit: (input: string, emoji?: string) => void
+  onCancel?: () => void
 }
 
 const BasicInputFormLocal = ({
@@ -27,6 +28,7 @@ const BasicInputFormLocal = ({
   onSubmit,
   inputRef,
   defaultIcon,
+  onCancel,
 }: EmojiInputFormProps) => {
   const [value, setValue] = useState(defaultInputValue)
 
@@ -57,6 +59,7 @@ const BasicInputFormLocal = ({
           ],
         },
       ]}
+      onCancel={onCancel}
       submitButton={submitButtonProps}
       onSubmit={() => onSubmit(value)}
     />

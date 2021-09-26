@@ -46,10 +46,10 @@ import { SidebarTreeSortingOrder } from '../../../../shared/lib/sidebar'
 import {
   CreateFolderRequestBody,
   CreateNoteRequestBody,
-} from '../../hooks/local/useLocalDB'
+} from '../../hooks/useLocalDB'
 import { NavResource } from '../../interfaces/resources'
 import { CollapsableType } from '../../stores/sidebarCollapse'
-import { LocalExportResourceRequestBody } from '../../hooks/local/useLocalUI'
+import { LocalExportResourceRequestBody } from '../../hooks/useLocalUI'
 import {
   SidebarNavCategory,
   SidebarNavControls,

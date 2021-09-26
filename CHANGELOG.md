@@ -18,6 +18,8 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 ### Fixed
 
 - Space navigation on space remove (defaults to first available space)
+- Focus title not working
+- Auto-focus on opening rename or other modal dialogs with form inputs
 
 ## [Released]
 
