@@ -64,7 +64,7 @@ const AttachmentsPage = ({ storage }: AttachmentsPageProps) => {
       >
         <PageDraggableHeader
           iconPath={mdiPaperclip}
-          label={`Attachments in ${storage.name}`}
+          label={`Attachments in space ${storage.name}`}
         />
 
         <AttachmentList workspace={storage} />

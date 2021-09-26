@@ -68,6 +68,14 @@ const ArchiveDetail = ({ storage }: TrashDetailProps) => {
     [setPreferences]
   )
 
+  if (notes.length === 0) {
+    return (
+      <NoArchivedItemsContainer>
+        No archived documents, please archive some to see them here.
+      </NoArchivedItemsContainer>
+    )
+  }
+
   return (
     <PageContainer>
       <Header>
@@ -100,6 +108,10 @@ const ArchiveDetail = ({ storage }: TrashDetailProps) => {
 }
 
 export default ArchiveDetail
+
+const NoArchivedItemsContainer = styled.div`
+  margin: 1em;
+`
 
 const Header = styled.h1`
   display: flex;

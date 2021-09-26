@@ -1,24 +1,32 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useCallback } from 'react'
 import { NoteStorage, Attachment, AttachmentData } from '../../lib/db/types'
-import { values } from '../../lib/db/utils'
+import { size, values } from '../../lib/db/utils'
 import { downloadBlob } from '../../lib/download'
-import { openNew } from '../../lib/platform'
-import { openContextMenu } from '../../lib/electronOnly'
+import { openContextMenu, openPath } from '../../lib/electronOnly'
 import copy from 'copy-to-clipboard'
 import styled from '../../shared/lib/styled'
 import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
+import ImagePreview from '../molecules/Image/ImagePreview'
+import { useModal } from '../../shared/lib/stores/modal'
 
 const ListContainer = styled.div`
   display: flex;
   align-items: center;
+
+  flex-direction: row;
+  flex-wrap: wrap;
 `
 
 const ListItem = styled.div`
-  width: 80px;
-  height: 80px;
-  margin: 10px;
+  width: 90px;
+  height: 90px;
+  margin: 6px;
   background-size: cover;
   background-position: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 interface AttachmentListItemProps {
@@ -30,8 +38,10 @@ const AttachmentListItem = ({
   workspaceId,
   attachment,
 }: AttachmentListItemProps) => {
+  const { closeLastModal, openModal } = useModal()
   const { removeAttachment } = useLocalUI()
   const [data, setData] = useState<AttachmentData | null>(null)
+
   useEffect(() => {
     attachment.getData().then((data) => {
       setData(data)
@@ -49,6 +59,19 @@ const AttachmentListItem = ({
         return data.src
     }
   }, [data])
+
+  const showEnlargedImage = useCallback(() => {
+    if (src == '') {
+      return
+    }
+    closeLastModal()
+    openModal(<ImagePreview src={src} />, {
+      showCloseIcon: true,
+      hideBackground: true,
+      width: 'full',
+    })
+  }, [closeLastModal, openModal, src])
+
   useEffect(() => {
     return () => {
       URL.revokeObjectURL(src)
@@ -58,8 +81,10 @@ const AttachmentListItem = ({
   if (data == null) {
     return null
   }
+
   return (
     <ListItem
+      onClick={showEnlargedImage}
       key={attachment!.name}
       style={{
         backgroundImage: `url("${src}")`,
@@ -80,9 +105,10 @@ const AttachmentListItem = ({
                 }
               : {
                   type: 'normal',
-                  label: 'Open',
+                  label: 'Open on disk',
                   click: () => {
-                    openNew(data.src)
+                    const filePath = data.src.substring('file://'.length)
+                    openPath(filePath)
                   },
                 },
             {
@@ -110,21 +136,31 @@ interface AttachmentListProps {
 const AttachmentList = ({ workspace }: AttachmentListProps) => {
   const { attachmentMap } = workspace
 
-  return (
-    <ListContainer>
-      {useMemo(() => {
-        return values(attachmentMap).map((attachment) => {
-          return (
-            <AttachmentListItem
-              workspaceId={workspace.id}
-              attachment={attachment}
-              key={attachment.name}
-            />
-          )
-        })
-      }, [attachmentMap, workspace])}
-    </ListContainer>
-  )
+  const attachments = useMemo(() => {
+    if (size(attachmentMap) === 0) {
+      return (
+        <NoAttachmentsContainer>
+          No attachments found, please add some images to a document to see them
+          here.
+        </NoAttachmentsContainer>
+      )
+    }
+    return values(attachmentMap).map((attachment) => {
+      return (
+        <AttachmentListItem
+          workspaceId={workspace.id}
+          attachment={attachment}
+          key={attachment.name}
+        />
+      )
+    })
+  }, [attachmentMap, workspace])
+
+  return <ListContainer>{attachments}</ListContainer>
 }
+
+const NoAttachmentsContainer = styled.div`
+  margin: 1em;
+`
 
 export default AttachmentList
