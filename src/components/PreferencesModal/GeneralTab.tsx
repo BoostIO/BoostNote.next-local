@@ -33,7 +33,7 @@ const GeneralTab = () => {
       <Form
         rows={[
           {
-            title: t('preferences.applicationTheme'),
+            title: t('application.theme'),
             items: [
               {
                 type: 'node',
@@ -41,8 +41,20 @@ const GeneralTab = () => {
                   <SimpleFormSelect
                     value={preferences['general.theme']}
                     onChange={selectTheme}
-                    options={['dark', 'light', 'sepia', 'solarizedDark']}
-                    labels={['Dark', 'Light', 'Sepia', 'Solarized Dark']}
+                    options={[
+                      'dark',
+                      'light',
+                      'sepia',
+                      'solarizedDark',
+                      'legacy',
+                    ]}
+                    labels={[
+                      'Dark',
+                      'Light',
+                      'Sepia',
+                      'Solarized Dark',
+                      'Legacy',
+                    ]}
                   />
                 ),
               },

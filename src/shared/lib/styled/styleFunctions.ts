@@ -5,6 +5,7 @@ import { solarizedDarkTheme } from './solarizedDark'
 import { BaseTheme, ThemeTypes } from './types'
 import { isColorBright } from '../../../lib/colors'
 import { TagStyleProps } from '../../../components/atoms/TagNavigatorListItem'
+import { legacyTheme } from './legacy'
 
 export interface StyledProps {
   theme: BaseTheme
@@ -18,6 +19,8 @@ export function selectV2Theme(theme: ThemeTypes) {
       return sepiaTheme
     case 'solarizedDark':
       return solarizedDarkTheme
+    case 'legacy':
+      return legacyTheme
     case 'dark':
     default:
       return darkTheme
