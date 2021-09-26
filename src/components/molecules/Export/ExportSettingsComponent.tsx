@@ -1,4 +1,4 @@
-import { LocalExportResourceRequestBody } from '../../../lib/v2/hooks/local/useLocalUI'
+import { LocalExportResourceRequestBody } from '../../../lib/v2/hooks/useLocalUI'
 import { ExportProcedureData } from './ExportProgressItem'
 import Form from '../../../shared/components/molecules/Form'
 import React, { useCallback, useState } from 'react'

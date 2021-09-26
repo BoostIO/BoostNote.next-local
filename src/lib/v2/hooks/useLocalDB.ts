@@ -1,15 +1,15 @@
 import { useCallback } from 'react'
 import shortid from 'shortid'
-import { useDb } from '../../../db'
-import { useRouter } from '../../../router'
+import { useDb } from '../../db'
+import { useRouter } from '../../router'
 import {
   FolderDoc,
   NoteDoc,
   NoteDocEditibleProps,
   NoteStorage,
-} from '../../../db/types'
-import useBulkApi from '../../../../shared/lib/hooks/useBulkApi'
-import { getFolderHref, getDocHref, getWorkspaceHref } from '../../../db/utils'
+} from '../../db/types'
+import useBulkApi from '../../../shared/lib/hooks/useBulkApi'
+import { getFolderHref, getDocHref, getWorkspaceHref } from '../../db/utils'
 import { join } from 'path'
 
 export function useLocalDB() {

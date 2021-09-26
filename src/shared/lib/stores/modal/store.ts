@@ -1,5 +1,5 @@
 import { createStoreContext } from '../../utils/context'
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   ModalsContext,
   ModalOpeningOptions,

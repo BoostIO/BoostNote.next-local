@@ -1,6 +1,6 @@
 import { mdiTextBoxPlus } from '@mdi/js'
 import React from 'react'
-import { useLocalUI } from '../../lib/v2/hooks/local/useLocalUI'
+import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
 import { NoteStorage } from '../../lib/db/types'
 import SidebarButton from '../../shared/components/organisms/Sidebar/atoms/SidebarButton'
 

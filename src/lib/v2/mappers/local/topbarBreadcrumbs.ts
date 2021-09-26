@@ -24,7 +24,7 @@ import {
   getParentFolderPathname,
   getWorkspaceHref,
 } from '../../../db/utils'
-import { LocalNewResourceRequestBody } from '../../hooks/local/useLocalUI'
+import { LocalNewResourceRequestBody } from '../../hooks/useLocalUI'
 import { TopbarBreadcrumbProps } from '../../../../shared/components/organisms/Topbar'
 import { FormRowProps } from '../../../../shared/components/molecules/Form/templates/FormRow'
 import { topParentId } from './topbarTree'

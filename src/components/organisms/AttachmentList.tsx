@@ -6,7 +6,7 @@ import { openNew } from '../../lib/platform'
 import { openContextMenu } from '../../lib/electronOnly'
 import copy from 'copy-to-clipboard'
 import styled from '../../shared/lib/styled'
-import { useLocalUI } from '../../lib/v2/hooks/local/useLocalUI'
+import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
 
 const ListContainer = styled.div`
   display: flex;

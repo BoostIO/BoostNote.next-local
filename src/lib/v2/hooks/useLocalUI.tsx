@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { mdiFileDocumentOutline, mdiFolderOutline, mdiPencil } from '@mdi/js'
-import { FolderDoc, NoteDoc, NoteStorage } from '../../../db/types'
-import { useDb } from '../../../db'
+import { FolderDoc, NoteDoc, NoteStorage } from '../../db/types'
+import { useDb } from '../../db'
 import {
   getFolderHref,
   getFolderNameFromPathname,
@@ -9,23 +9,21 @@ import {
   getNoteTitle,
   getParentFolderPathname,
   getDocHref,
-} from '../../../db/utils'
+} from '../../db/utils'
 import { join } from 'path'
-import BasicInputFormLocal from '../../../../components/v2/organisms/BasicInputFormLocal'
-import { useModal } from '../../../../shared/lib/stores/modal'
-import {
-  DialogIconTypes,
-  useDialog,
-} from '../../../../shared/lib/stores/dialog'
-import { useToast } from '../../../../shared/lib/stores/toast'
-import { useGeneralStatus } from '../../../generalStatus'
-import { FormRowProps } from '../../../../shared/components/molecules/Form/templates/FormRow'
+import BasicInputFormLocal from '../../../components/v2/organisms/BasicInputFormLocal'
+import { useModal } from '../../../shared/lib/stores/modal'
+import { DialogIconTypes, useDialog } from '../../../shared/lib/stores/dialog'
+import { useToast } from '../../../shared/lib/stores/toast'
+import { useGeneralStatus } from '../../generalStatus'
+import { FormRowProps } from '../../../shared/components/molecules/Form/templates/FormRow'
 import ExportProgressItem, {
   ExportProcedureData,
-} from '../../../../components/molecules/Export/ExportProgressItem'
-import ExportSettingsComponent from '../../../../components/molecules/Export/ExportSettingsComponent'
+} from '../../../components/molecules/Export/ExportProgressItem'
+import ExportSettingsComponent from '../../../components/molecules/Export/ExportSettingsComponent'
 import { useTranslation } from 'react-i18next'
-import { useRouter } from '../../../router'
+import { useRouter } from '../../router'
+import useFocus from './Focus'
 
 export function useLocalUI() {
   const { openSideNavFolderItemRecursively } = useGeneralStatus()
@@ -48,12 +46,12 @@ export function useLocalUI() {
   const { t } = useTranslation()
 
   const [openingModal, setOpeningModal] = useState<boolean>(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputRef, setInputFocus] = useFocus()
   useEffect(() => {
     if (openingModal && inputRef.current != null) {
-      inputRef.current.focus()
+      setInputFocus()
     }
-  }, [inputRef, openingModal])
+  }, [inputRef, openingModal, setInputFocus])
 
   const closeModalAndUpdateState = useCallback(() => {
     closeLastModal()
@@ -83,6 +81,7 @@ export function useLocalUI() {
             renameStorage(workspace.id, workspaceName)
             closeModalAndUpdateState()
           }}
+          onCancel={() => closeModalAndUpdateState()}
         />,
         {
           showCloseIcon: true,
@@ -90,7 +89,14 @@ export function useLocalUI() {
         }
       )
     },
-    [closeModalAndUpdateState, openModal, pushMessage, renameStorage, t]
+    [
+      closeModalAndUpdateState,
+      inputRef,
+      openModal,
+      pushMessage,
+      renameStorage,
+      t,
+    ]
   )
 
   const openRenameFolderForm = useCallback(
@@ -141,6 +147,7 @@ export function useLocalUI() {
             openSideNavFolderItemRecursively(workspaceId, newFolderPathname)
             closeModalAndUpdateState()
           }}
+          onCancel={() => closeModalAndUpdateState()}
         />,
         {
           showCloseIcon: true,
@@ -150,6 +157,7 @@ export function useLocalUI() {
     },
     [
       openModal,
+      inputRef,
       renameFolder,
       push,
       openSideNavFolderItemRecursively,
@@ -183,6 +191,7 @@ export function useLocalUI() {
             }
             closeModalAndUpdateState()
           }}
+          onCancel={() => closeModalAndUpdateState()}
         />,
         {
           showCloseIcon: true,
@@ -190,7 +199,7 @@ export function useLocalUI() {
         }
       )
     },
-    [closeModalAndUpdateState, openModal, pushMessage, updateNote]
+    [closeModalAndUpdateState, inputRef, openModal, pushMessage, updateNote]
   )
 
   const openNewFolderForm = useCallback(
@@ -241,6 +250,7 @@ export function useLocalUI() {
               closeModalAndUpdateState()
             }
           }}
+          onCancel={() => closeModalAndUpdateState()}
         />,
         {
           showCloseIcon: true,
@@ -248,7 +258,14 @@ export function useLocalUI() {
         }
       )
     },
-    [openModal, createFolder, pushMessage, push, closeModalAndUpdateState]
+    [
+      openModal,
+      inputRef,
+      createFolder,
+      pushMessage,
+      push,
+      closeModalAndUpdateState,
+    ]
   )
 
   const openNewDocForm = useCallback(
@@ -282,6 +299,7 @@ export function useLocalUI() {
 
             closeModalAndUpdateState()
           }}
+          onCancel={() => closeModalAndUpdateState()}
         />,
         {
           showCloseIcon: true,
@@ -289,7 +307,7 @@ export function useLocalUI() {
         }
       )
     },
-    [openModal, createNote, push, closeModalAndUpdateState]
+    [openModal, inputRef, createNote, closeModalAndUpdateState, push]
   )
 
   const removeWorkspace = useCallback(
