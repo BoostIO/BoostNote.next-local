@@ -28,6 +28,7 @@ import {
 import { rehypePosition } from '../../lib/markdown/rehypePosition'
 import styled from '../../shared/lib/styled'
 import rehypeCodeMirror from '../../shared/lib/codemirror/rehypeCodeMirror'
+import ExpandableImage from '../molecules/Image/ExpandableImage'
 
 const schema = mergeDeepRight(gh, {
   attributes: {
@@ -94,7 +95,7 @@ const MarkdownPreviewer = ({
           }
         }
 
-        return <img {...props} src={src} />
+        return <ExpandableImage {...props} src={src} />
       },
       a: ({ href, children }: any) => {
         return (

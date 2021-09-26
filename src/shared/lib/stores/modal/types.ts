@@ -4,7 +4,9 @@ export interface ModalElement {
   title?: React.ReactNode
   content: React.ReactNode
   showCloseIcon?: boolean
-  width: 'large' | 'default' | 'small' | number
+  width: 'large' | 'default' | 'small' | 'full' | number
+  height?: number
+  maxHeight?: number
   position?: {
     left: number
     right: number
@@ -12,6 +14,8 @@ export interface ModalElement {
     bottom: number
     alignment: ContextModalAlignment
   }
+  hideBackground?: boolean
+  removePadding?: boolean
   onClose?: () => void
 }
 
@@ -19,13 +23,15 @@ export type ContextModalAlignment = 'bottom-left' | 'bottom-right'
 export type ModalOpeningOptions = {
   showCloseIcon?: boolean
   keepAll?: boolean
-  width?: 'large' | 'default' | 'small' | number
+  width?: 'large' | 'default' | 'small' | 'full' | number
+  hideBackground?: boolean
   title?: string
   onClose?: () => void
 }
 
 export type ContextModalOpeningOptions = ModalOpeningOptions & {
   alignment?: ContextModalAlignment
+  hideBackground?: boolean
 }
 
 export interface ModalsContext {

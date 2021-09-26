@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { Attachment, AttachmentData } from '../../../lib/db/types'
+import ExpandableImage from '../../molecules/Image/ExpandableImage'
 
 interface AttachmentImageProps {
   attachment: Attachment
@@ -8,6 +9,7 @@ interface AttachmentImageProps {
 
 const AttachmentImage = ({ attachment, ...props }: AttachmentImageProps) => {
   const [data, setData] = useState<AttachmentData | null>(null)
+
   useEffect(() => {
     attachment.getData().then((data) => {
       setData(data)
@@ -35,7 +37,7 @@ const AttachmentImage = ({ attachment, ...props }: AttachmentImageProps) => {
     return null
   }
 
-  return <img src={src} {...props} />
+  return <ExpandableImage src={src} {...props} />
 }
 
 export default AttachmentImage

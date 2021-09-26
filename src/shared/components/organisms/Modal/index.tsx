@@ -72,7 +72,16 @@ const ContextModalItem = ({
   const style: CSSProperties | undefined = useMemo(() => {
     const properties: CSSProperties = {
       width: modalWidth,
-      maxHeight: windowHeight - (modal.position?.bottom || 0) - 10,
+      height: modal.height,
+      maxHeight:
+        modal.position?.alignment === 'bottom-left' ||
+        modal.position?.alignment === 'bottom-right'
+          ? windowHeight - (modal.position?.bottom || 0) - 10
+          : modal.maxHeight != null
+          ? modal.maxHeight
+          : (modal.position?.top || 0) -
+            ((modal.position?.bottom || 0) - (modal.position?.top || 0)) -
+            10,
     }
 
     if (modal.position != null) {
@@ -96,19 +105,35 @@ const ContextModalItem = ({
       }
     }
 
+    if (properties.maxHeight! < 80) {
+      properties.minHeight = 100
+      properties.maxHeight = 200
+      properties.top = undefined
+      properties.bottom = 6
+    }
+
     return properties
-  }, [modal.position, windowWidth, modalWidth, windowHeight])
+  }, [
+    modalWidth,
+    modal.height,
+    modal.position,
+    modal.maxHeight,
+    windowHeight,
+    windowWidth,
+  ])
 
   return (
     <>
       <div className='modal__window__scroller'>
-        <div className='modal__bg__hidden' onClick={closeModal}></div>
+        <div className='modal__bg__hidden' onClick={closeModal} />
         <div className='modal__window__anchor' />
         <VerticalScroller
           className={cc([
             'modal__window',
             `modal__window__width--${modal.width}`,
             modal.position != null && `modal__window--context`,
+            modal.hideBackground && 'modal__window--no-bg',
+            modal.removePadding && 'modal__window--no-padding',
           ])}
           style={style}
         >
@@ -157,6 +182,7 @@ const ModalItem = ({
         className={cc([
           'modal__window',
           `modal__window__width--${modal.width}`,
+          modal.hideBackground && 'modal__window--no-bg',
           modal.position != null && `modal__window--context`,
         ])}
       >
@@ -196,6 +222,15 @@ const Container = styled.div`
     opacity: 0.7;
   }
 
+  .modal__window--no-bg {
+    background: none !important;
+  }
+
+  .modal__window--context.modal__window--no-padding,
+  .modal__window--context.modal__window--no-padding .modal__wrapper {
+    padding: 0 !important;
+  }
+
   .modal__bg__hidden {
     z-index: ${zIndexModals + 1};
     position: fixed;
@@ -224,8 +259,9 @@ const Container = styled.div`
 
   .modal__window--context {
     border: 1px solid ${({ theme }) => theme.colors.border.main};
+    height: auto !important;
+    position: fixed !important;
     margin: 0 !important;
-    bottom: 0;
     right: 0;
     left: 0;
     background-color: ${({ theme }) =>
@@ -255,6 +291,10 @@ const Container = styled.div`
 
     &.modal__window__width--large {
       width: 1100px;
+    }
+
+    &.modal__window__width--full {
+      width: 100%;
     }
   }
 

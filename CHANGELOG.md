@@ -14,12 +14,15 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 ### Added
 
 - The welcome note on space creation or import
+- Markdown Preview option to enlarge image on click
+- Attachments page enlarge image on click
 
 ### Fixed
 
 - Space navigation on space remove (defaults to first available space)
 - Focus title not working
 - Auto-focus on opening rename or other modal dialogs with form inputs
+- Attachments context menu open button not working (open on disk works now)
 
 ## [Released]
 
