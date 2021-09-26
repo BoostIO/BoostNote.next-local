@@ -303,8 +303,9 @@ export function useLocalUI() {
           {
             variant: 'warning',
             label: t('storage.remove'),
-            onClick: () => {
-              removeStorage(workspace.id)
+            onClick: async () => {
+              await removeStorage(workspace.id)
+              push('/')
             },
           },
           {
@@ -316,7 +317,7 @@ export function useLocalUI() {
         ],
       })
     },
-    [messageBox, removeStorage, t]
+    [messageBox, push, removeStorage, t]
   )
 
   const deleteFolder = useCallback(

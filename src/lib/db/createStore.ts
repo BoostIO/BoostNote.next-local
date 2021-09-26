@@ -205,10 +205,13 @@ export function createDbStoreCreator(
 
         const storageData = { id, name }
 
-        const storage = await prepareStorage({
-          ...storageData,
-          ...props,
-        })
+        const storage = await prepareStorage(
+          {
+            ...storageData,
+            ...props,
+          },
+          true
+        )
 
         let newStorageMap: ObjectMap<NoteStorage> = {}
         setStorageMap((prevStorageMap) => {
@@ -1347,11 +1350,12 @@ function saveStorageDataList(
 }
 
 async function prepareStorage(
-  storageData: NoteStorageData
+  storageData: NoteStorageData,
+  newStorage?: boolean
 ): Promise<NoteStorage> {
   const { id, name } = storageData
   const db = new FSNoteDb(id, name, storageData.location)
-  await db.init()
+  await db.init(newStorage)
 
   const foldersToUpdateOrderedIds: string[] = []
 
