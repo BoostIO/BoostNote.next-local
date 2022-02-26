@@ -64,6 +64,15 @@ export interface DbStore {
     newOrderedIds: string[]
   ) => Promise<FolderDoc | undefined>
   removeFolder: (storageId: string, pathname: string) => Promise<void>
+  getNotePathname(
+    storageId: string,
+    noteId: string
+  ): Promise<string | undefined>
+  copyNoteLink(
+    storageId: string,
+    noteId: string,
+    noteProps: Partial<NoteDocEditibleProps>
+  ): Promise<string | undefined>
   createNote(
     storageId: string,
     noteProps: Partial<NoteDocEditibleProps>
@@ -524,6 +533,21 @@ export function createDbStoreCreator(
       [storageMap, currentPathnameWithoutNoteId, setStorageMap, router]
     )
 
+    const getNotePathname = useCallback(
+      async (storageId: string, noteId: string) => {
+        const storage = storageMap[storageId]
+        if (storage == null) {
+          return
+        }
+        const noteDoc = await storage.db.getNote(noteId)
+        if (noteDoc == null) {
+          return
+        }
+        return noteDoc.folderPathname
+      },
+      [storageMap]
+    )
+
     const updateNote = useCallback(
       async (
         storageId: string,
@@ -534,6 +558,7 @@ export function createDbStoreCreator(
         if (storage == null) {
           return
         }
+
         let previousNoteDoc = await storage.db.getNote(noteId)
         const noteDoc = await storage.db.updateNote(noteId, noteProps)
         if (noteDoc == null) {
@@ -785,6 +810,26 @@ export function createDbStoreCreator(
         )
       },
       [setStorageMap, storageMap]
+    )
+
+    const copyNoteLink = useCallback(
+      async (
+        storageId: string,
+        noteId: string,
+        noteProps: Partial<NoteDocEditibleProps>
+      ) => {
+        const storage = storageMap[storageId]
+        if (storage == null) {
+          return
+        }
+        const noteLink = await storage.db.copyNoteLink(noteId, noteProps)
+        if (noteLink == null) {
+          return
+        } else {
+          return noteLink
+        }
+      },
+      [storageMap]
     )
 
     const trashNote = useCallback(
@@ -1286,6 +1331,8 @@ export function createDbStoreCreator(
       removeFolder,
       createNote,
       updateNote,
+      getNotePathname,
+      copyNoteLink,
       trashNote,
       untrashNote,
       purgeNote,

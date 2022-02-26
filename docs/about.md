@@ -53,6 +53,7 @@ Finally, users can add attachments and charts ([PlantUML](https://plantuml.com/)
     - Supports case sensitive search
     - Supports multiline search
     - Supports keyboard navigation
+  - Link between notes
 - Side Navigator
   - Folder hierarchy
   - Supports Drag and Drop

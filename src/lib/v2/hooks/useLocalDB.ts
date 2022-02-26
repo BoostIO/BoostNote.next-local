@@ -28,6 +28,7 @@ export function useLocalDB() {
     renameFolder,
     updateFolderOrderedIds,
     storageMap: workspaceMap,
+    copyNoteLink,
   } = useDb()
   const { push } = useRouter()
 
@@ -230,6 +231,7 @@ export function useLocalDB() {
     renameFolderApi,
     updateFolderOrderedIdsApi,
     workspaceMap,
+    copyNoteLink,
   }
 }
 
