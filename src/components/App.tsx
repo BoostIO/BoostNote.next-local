@@ -8,9 +8,12 @@ import '../lib/i18n'
 import CodeMirrorStyle from './CodeMirrorStyle'
 import { useEffectOnce } from 'react-use'
 import { useRouter } from '../lib/router'
-import { values, keys, size } from '../lib/db/utils'
+import { values, keys, prependNoteIdPrefix, size } from '../lib/db/utils'
+import { useActiveStorageId } from '../lib/routeParams'
 import { addIpcListener, removeIpcListener } from '../lib/electronOnly'
+import { getNoteFullItemId } from '../lib/nav'
 import { useBoostNoteProtocol } from '../lib/protocol'
+import { IpcRendererEvent } from 'electron/renderer'
 import { useStorageRouter } from '../lib/storageRouter'
 import ExternalStyle from './ExternalStyle'
 import { selectV2Theme } from '../shared/lib/styled/styleFunctions'
@@ -37,12 +40,18 @@ const AppContainer = styled.div`
 `
 
 const App = () => {
-  const { initialize, storageMap, getUninitializedStorageData } = useDb()
-  const { push, pathname } = useRouter()
+  const {
+    initialize,
+    storageMap,
+    getNotePathname,
+    getUninitializedStorageData,
+  } = useDb()
+  const { push, pathname, replace } = useRouter()
   const [initialized, setInitialized] = useState(false)
   const { togglePreferencesModal, preferences } = usePreferences()
   const { navigate: navigateToStorage } = useStorageRouter()
   const { pushMessage } = useToast()
+  const activeStorageId = useActiveStorageId()
 
   useEffectOnce(() => {
     initialize()
@@ -80,6 +89,39 @@ const App = () => {
         console.error(error)
       })
   })
+
+  useEffect(() => {
+    const noteLinkNavigateEventHandler = (
+      _: IpcRendererEvent,
+      noteHref: string
+    ) => {
+      const noteId = Array.isArray(noteHref) ? noteHref[0] : noteHref
+      if (!activeStorageId) {
+        pushMessage({
+          title: 'Invalid navigation!',
+          description: 'Cannot open note link without storage information.',
+        })
+      } else {
+        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
+          (pathname) => {
+            if (pathname) {
+              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
+            } else {
+              pushMessage({
+                title: 'Note link invalid!',
+                description:
+                  'The note link you are trying to open is invalid or from another storage.',
+              })
+            }
+          }
+        )
+      }
+    }
+    addIpcListener('note:navigate', noteLinkNavigateEventHandler)
+    return () => {
+      removeIpcListener('note:navigate', noteLinkNavigateEventHandler)
+    }
+  }, [activeStorageId, getNotePathname, pushMessage, replace])
 
   useEffect(() => {
     const preferencesIpcEventHandler = () => {

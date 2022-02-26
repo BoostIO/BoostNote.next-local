@@ -38,6 +38,7 @@ import SidebarHeader, {
   SidebarControls,
 } from '../../shared/components/organisms/Sidebar/atoms/SidebarHeader'
 import SidebarButtonList from '../../shared/components/organisms/Sidebar/molecules/SidebarButtonList'
+import { useToast } from '../../shared/lib/stores/toast'
 
 interface SidebarContainerProps {
   workspace?: NoteStorage
@@ -62,6 +63,7 @@ const SidebarContainer = ({
     deleteFolderApi,
     toggleDocArchived,
     toggleDocBookmark,
+    copyNoteLink,
   } = useLocalDB()
   const {
     openWorkspaceEditForm,
@@ -82,6 +84,8 @@ const SidebarContainer = ({
     unfoldItem,
     foldItem,
   } = useSidebarCollapse()
+
+  const { pushMessage } = useToast()
 
   const localSpaces = useMemo(() => values(storageMap), [storageMap])
 
@@ -312,7 +316,9 @@ const SidebarContainer = ({
       dropInDocOrFolder,
       openRenameFolderForm,
       openRenameDocForm,
-      exportDocuments
+      exportDocuments,
+      copyNoteLink,
+      pushMessage
     )
   }, [
     workspace,
@@ -334,6 +340,8 @@ const SidebarContainer = ({
     openRenameFolderForm,
     openRenameDocForm,
     exportDocuments,
+    copyNoteLink,
+    pushMessage,
   ])
 
   const sidebarHeaderControls: SidebarControls = useMemo(() => {

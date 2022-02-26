@@ -53,6 +53,16 @@ const StyledContainer = styled.div`
       theme.codeEditorSelectedTextBackgroundColor};
     border: 1px solid #fffae3;
   }
+
+  .CodeMirror-hyperlink {
+    cursor: pointer;
+  }
+
+  .CodeMirror-hover {
+    padding: 2px 4px 0 4px;
+    position: absolute;
+    z-index: 99;
+  }
 `
 
 const defaultCodeMirrorOptions: CodeMirror.EditorConfiguration = {

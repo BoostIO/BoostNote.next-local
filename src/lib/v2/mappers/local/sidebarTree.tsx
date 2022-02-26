@@ -9,6 +9,7 @@ import {
   mdiFileDocumentOutline,
   mdiTextBoxPlus,
   mdiFolderPlusOutline,
+  mdiLinkVariant,
   mdiPaperclip,
   mdiPencil,
   mdiStar,
@@ -22,6 +23,7 @@ import React from 'react'
 import {
   FolderDoc,
   NoteDoc,
+  NoteDocEditibleProps,
   NoteStorage,
   ObjectMap,
   TagDoc,
@@ -56,6 +58,8 @@ import {
   SidebarTreeChildRow,
 } from '../../../../shared/components/organisms/Sidebar/molecules/SidebarTree'
 import { FOLDER_ID_PREFIX } from '../../../db/consts'
+import copy from 'copy-to-clipboard'
+import { ToastMessage } from '../../../../shared/lib/stores/toast'
 
 type LocalTreeItem = {
   id: string
@@ -206,7 +210,13 @@ export function mapTree(
   exportDocuments: (
     workspace: NoteStorage,
     exportSettings: LocalExportResourceRequestBody
-  ) => void
+  ) => void,
+  copyNoteLink: (
+    storageId: string,
+    noteId: string,
+    noteProps: Partial<NoteDocEditibleProps>
+  ) => Promise<string | undefined>,
+  pushMessage: (context: any) => any
 ): SidebarNavCategory[] | undefined {
   if (!initialLoadDone || workspace == null) {
     return undefined
@@ -378,6 +388,30 @@ export function mapTree(
           icon: mdiArchiveOutline,
           label: doc.trashed ? 'Restore' : 'Archive',
           onClick: () => toggleNoteArchived(workspace.id, noteId, doc.trashed),
+        },
+        {
+          type: MenuTypes.Normal,
+          icon: mdiLinkVariant,
+          label: 'Copy note link',
+          onClick: async () => {
+            const noteLink = await copyNoteLink(workspace.id, noteId, {
+              title: getNoteTitle(doc, 'Untitled'),
+              folderPathname: doc.folderPathname,
+            })
+            if (noteLink) {
+              copy(noteLink)
+              pushMessage({
+                title: 'Note Link Copied',
+                description: 'Paste note link in any note to add a link to it',
+              })
+            } else {
+              pushMessage({
+                title: 'Note Link Error',
+                description:
+                  'An error occurred while attempting to create a note link',
+              })
+            }
+          },
         },
       ],
       parentId: parentNoteId,

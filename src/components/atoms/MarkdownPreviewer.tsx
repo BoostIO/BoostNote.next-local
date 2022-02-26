@@ -29,6 +29,16 @@ import { rehypePosition } from '../../lib/markdown/rehypePosition'
 import styled from '../../shared/lib/styled'
 import rehypeCodeMirror from '../../shared/lib/codemirror/rehypeCodeMirror'
 import ExpandableImage from '../molecules/Image/ExpandableImage'
+import { useActiveStorageId } from '../../lib/routeParams'
+import { useRouter } from '../../lib/router'
+import { useDb } from '../../lib/db'
+import {
+  isNoteLinkId,
+  prependNoteIdPrefix,
+  removePrefixFromNoteLinks,
+} from '../../lib/db/utils'
+import { getNoteFullItemId } from '../../lib/nav'
+import { useToast } from '../../shared/lib/stores/toast'
 
 const schema = mergeDeepRight(gh, {
   attributes: {
@@ -70,12 +80,15 @@ const MarkdownPreviewer = ({
   attachmentMap = {},
   updateContent,
 }: MarkdownPreviewerProps) => {
+  const { replace } = useRouter()
   const [rendering, setRendering] = useState(false)
   const previousContentRef = useRef('')
   const previousThemeRef = useRef<string | undefined>('')
   const [renderedContent, setRenderedContent] = useState<React.ReactNode>([])
-
   const checkboxIndexRef = useRef<number>(0)
+  const { getNotePathname } = useDb()
+  const activeStorageId = useActiveStorageId()
+  const { pushMessage } = useToast()
 
   const remarkAdmonitionOptions = {
     tag: ':::',
@@ -103,7 +116,13 @@ const MarkdownPreviewer = ({
             href={href}
             onClick={(event) => {
               event.preventDefault()
-              openNew(href)
+              if (href) {
+                if (isNoteLinkId(href)) {
+                  navigateToNote(href)
+                } else {
+                  openNew(href)
+                }
+              }
             }}
           >
             {children}
@@ -138,6 +157,32 @@ const MarkdownPreviewer = ({
     },
   }
 
+  const navigateToNote = useCallback(
+    (noteId) => {
+      if (!activeStorageId) {
+        pushMessage({
+          title: 'Invalid navigation!',
+          description: 'Cannot open note link without storage information.',
+        })
+      } else {
+        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
+          (pathname) => {
+            if (pathname) {
+              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
+            } else {
+              pushMessage({
+                title: 'Note link invalid!',
+                description:
+                  'The note link you are trying to open is invalid or from another storage.',
+              })
+            }
+          }
+        )
+      }
+    },
+    [activeStorageId, pushMessage, getNotePathname, replace]
+  )
+
   const markdownProcessor = useMemo(() => {
     return unified()
       .use(remarkParse)
@@ -158,7 +203,14 @@ const MarkdownPreviewer = ({
       })
       .use(rehypeMermaid)
       .use(rehypeReact, rehypeReactConfig)
-  }, [remarkAdmonitionOptions, codeBlockTheme, rehypeReactConfig])
+  }, [
+    remarkAdmonitionOptions,
+    codeBlockTheme,
+    rehypeReactConfig,
+    navigateToNote,
+    attachmentMap,
+    updateContent,
+  ])
 
   const renderContent = useCallback(async () => {
     const content = previousContentRef.current
@@ -166,7 +218,9 @@ const MarkdownPreviewer = ({
 
     console.time('render')
     checkboxIndexRef.current = 0
-    const result = await markdownProcessor.process(content)
+
+    const contentWithValidNoteLinks = removePrefixFromNoteLinks(content)
+    const result = await markdownProcessor.process(contentWithValidNoteLinks)
     console.timeEnd('render')
 
     setRendering(false)
