@@ -59,7 +59,6 @@ import {
 } from '../../../../shared/components/organisms/Sidebar/molecules/SidebarTree'
 import { FOLDER_ID_PREFIX } from '../../../db/consts'
 import copy from 'copy-to-clipboard'
-import { ToastMessage } from '../../../../shared/lib/stores/toast'
 
 type LocalTreeItem = {
   id: string
@@ -401,6 +400,7 @@ export function mapTree(
             if (noteLink) {
               copy(noteLink)
               pushMessage({
+                type: 'success',
                 title: 'Note Link Copied',
                 description: 'Paste note link in any note to add a link to it',
               })
