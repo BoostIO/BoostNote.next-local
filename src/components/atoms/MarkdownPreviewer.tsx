@@ -36,6 +36,7 @@ import {
   isNoteLinkId,
   prependNoteIdPrefix,
   removePrefixFromNoteLinks,
+  values,
 } from '../../lib/db/utils'
 import { getNoteFullItemId } from '../../lib/nav'
 import { useToast } from '../../shared/lib/stores/toast'
@@ -86,7 +87,7 @@ const MarkdownPreviewer = ({
   const previousThemeRef = useRef<string | undefined>('')
   const [renderedContent, setRenderedContent] = useState<React.ReactNode>([])
   const checkboxIndexRef = useRef<number>(0)
-  const { getNotePathname } = useDb()
+  const { getNotePathname, storageMap } = useDb()
   const activeStorageId = useActiveStorageId()
   const { pushMessage } = useToast()
 
@@ -165,22 +166,30 @@ const MarkdownPreviewer = ({
           description: 'Cannot open note link without storage information.',
         })
       } else {
-        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
-          (pathname) => {
-            if (pathname) {
-              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
-            } else {
-              pushMessage({
-                title: 'Note link invalid!',
-                description:
-                  'The note link you are trying to open is invalid or from another storage.',
-              })
+        const noteIdWithPrefix = prependNoteIdPrefix(noteId)
+        let noteStorageId = activeStorageId
+        if (storageMap != null) {
+          for (const storage of values(storageMap)) {
+            if (storage.noteMap[noteIdWithPrefix] != null) {
+              noteStorageId = storage.id
+              break
             }
           }
-        )
+        }
+
+        getNotePathname(noteStorageId, noteIdWithPrefix).then((pathname) => {
+          if (pathname) {
+            replace(getNoteFullItemId(noteStorageId, pathname, noteId))
+          } else {
+            pushMessage({
+              title: 'Note link invalid!',
+              description: 'The note link you are trying to open is invalid.',
+            })
+          }
+        })
       }
     },
-    [activeStorageId, pushMessage, getNotePathname, replace]
+    [activeStorageId, pushMessage, storageMap, getNotePathname, replace]
   )
 
   const markdownProcessor = useMemo(() => {
@@ -203,14 +212,7 @@ const MarkdownPreviewer = ({
       })
       .use(rehypeMermaid)
       .use(rehypeReact, rehypeReactConfig)
-  }, [
-    remarkAdmonitionOptions,
-    codeBlockTheme,
-    rehypeReactConfig,
-    navigateToNote,
-    attachmentMap,
-    updateContent,
-  ])
+  }, [remarkAdmonitionOptions, codeBlockTheme, rehypeReactConfig])
 
   const renderContent = useCallback(async () => {
     const content = previousContentRef.current
