@@ -113,16 +113,23 @@ const App = () => {
           }
         }
 
-        getNotePathname(noteStorageId, noteIdWithPrefix).then((pathname) => {
-          if (pathname) {
-            replace(getNoteFullItemId(noteStorageId, pathname, noteId))
-          } else {
+        getNotePathname(noteStorageId, noteIdWithPrefix)
+          .then((pathname) => {
+            if (pathname) {
+              replace(getNoteFullItemId(noteStorageId, pathname, noteId))
+            } else {
+              pushMessage({
+                title: 'Note link invalid!',
+                description: 'The note link you are trying to open is invalid.',
+              })
+            }
+          })
+          .catch(() => {
             pushMessage({
               title: 'Note link invalid!',
               description: 'The note link you are trying to open is invalid.',
             })
-          }
-        })
+          })
       }
     }
     addIpcListener('note:navigate', noteLinkNavigateEventHandler)
