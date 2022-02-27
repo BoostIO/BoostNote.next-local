@@ -102,26 +102,34 @@ const App = () => {
           description: 'Cannot open note link without storage information.',
         })
       } else {
-        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
-          (pathname) => {
-            if (pathname) {
-              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
-            } else {
-              pushMessage({
-                title: 'Note link invalid!',
-                description:
-                  'The note link you are trying to open is invalid or from another storage.',
-              })
+        const noteIdWithPrefix = prependNoteIdPrefix(noteId)
+        let noteStorageId = activeStorageId
+        if (storageMap != null) {
+          for (const storage of values(storageMap)) {
+            if (storage.noteMap[noteIdWithPrefix] != null) {
+              noteStorageId = storage.id
+              break
             }
           }
-        )
+        }
+
+        getNotePathname(noteStorageId, noteIdWithPrefix).then((pathname) => {
+          if (pathname) {
+            replace(getNoteFullItemId(noteStorageId, pathname, noteId))
+          } else {
+            pushMessage({
+              title: 'Note link invalid!',
+              description: 'The note link you are trying to open is invalid.',
+            })
+          }
+        })
       }
     }
     addIpcListener('note:navigate', noteLinkNavigateEventHandler)
     return () => {
       removeIpcListener('note:navigate', noteLinkNavigateEventHandler)
     }
-  }, [activeStorageId, getNotePathname, pushMessage, replace])
+  }, [activeStorageId, getNotePathname, pushMessage, replace, storageMap])
 
   useEffect(() => {
     const preferencesIpcEventHandler = () => {
