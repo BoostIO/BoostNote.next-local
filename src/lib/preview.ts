@@ -440,6 +440,11 @@ hr {
   border-color: rgba(255,255,255,0.3);
   color: #36abe3;
 }
+
+.dark .markdown__custom__note_link  {
+  color: #2886ef;
+}
+
 `
 
 function loadPreviewStyle() {
