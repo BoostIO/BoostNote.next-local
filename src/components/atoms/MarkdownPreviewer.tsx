@@ -114,6 +114,7 @@ const MarkdownPreviewer = ({
       a: ({ href, children }: any) => {
         return (
           <a
+            className={'markdown__custom__note_link'}
             href={href}
             onClick={(event) => {
               event.preventDefault()
