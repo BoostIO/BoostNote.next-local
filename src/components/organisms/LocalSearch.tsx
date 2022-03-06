@@ -51,6 +51,15 @@ interface LocalSearchProps {
 
 export type SearchResultNavigationDirection = 'next' | 'previous'
 
+export function scrollEditorToLine(
+  editor: CodeMirror.EditorFromTextArea,
+  lineNumber: number
+) {
+  const t = editor.charCoords({ line: lineNumber, ch: 0 }, 'local').top
+  const middleHeight = editor.getScrollerElement().offsetHeight / 2
+  editor.scrollTo(null, t - middleHeight - 5)
+}
+
 const LocalSearch = ({
   searchQuery,
   replaceQuery,
@@ -145,12 +154,6 @@ const LocalSearch = ({
     setNumberOfFoundItems(0)
   }, [codeMirror])
 
-  const scrollToLine = useCallback((editor, lineNumber: number) => {
-    const t = editor.charCoords({ line: lineNumber, ch: 0 }, 'local').top
-    const middleHeight = editor.getScrollerElement().offsetHeight / 2
-    editor.scrollTo(null, t - middleHeight - 5)
-  }, [])
-
   const focusSearchItem = useCallback(
     (
       editor: CodeMirror.EditorFromTextArea,
@@ -182,7 +185,7 @@ const LocalSearch = ({
       }
 
       if (!focusingEditor) {
-        scrollToLine(editor, focusLocation.line)
+        scrollEditorToLine(editor, focusLocation.line)
       }
       if (updateCursor) {
         editor.focus()
@@ -194,7 +197,7 @@ const LocalSearch = ({
         }
       }
     },
-    [scrollToLine, onCursorActivity]
+    [onCursorActivity]
   )
 
   const markFoundItems = useCallback(

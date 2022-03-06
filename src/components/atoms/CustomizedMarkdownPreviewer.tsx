@@ -8,7 +8,8 @@ interface CustomizedMarkdownPreviewer {
   content: string
   attachmentMap?: ObjectMap<Attachment>
   updateContent?: (
-    newContentOrUpdater: string | ((newValue: string) => string)
+    newContentOrUpdater: string | ((newValue: string) => string),
+    checkboxUpdate?: boolean
   ) => void
 }
 
