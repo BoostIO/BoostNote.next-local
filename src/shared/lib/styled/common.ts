@@ -40,6 +40,7 @@ const commonTheme: SharedTheme = {
   codeEditorSelectedTextBackgroundColor: '#ffc107',
   sidebarSearchHighlightTextColor: '#E6E6E6',
   sidebarSearchHighlightBackgroundColor: '#6a320f',
+  scroll: { background: '#888' },
 }
 
 export default commonTheme

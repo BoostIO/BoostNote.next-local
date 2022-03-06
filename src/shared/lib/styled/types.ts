@@ -45,6 +45,9 @@ export interface SharedTheme {
   codeEditorSelectedTextBackgroundColor: string
   sidebarSearchHighlightTextColor: string
   sidebarSearchHighlightBackgroundColor: string
+  scroll: {
+    background: string
+  }
 }
 
 /** background color gradient => starting from main color, fade more and more towards the opposite BW ***/

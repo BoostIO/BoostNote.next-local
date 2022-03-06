@@ -17,52 +17,14 @@ import 'codemirror/keymap/emacs'
 import 'codemirror/keymap/vim'
 import 'codemirror-abap'
 import { loadMode } from '../shared/lib/codemirror/util'
-import debounce from 'lodash/debounce'
 
 // Custom addons
 import { initHyperlink } from './addons/hyperlink'
-
-const dispatchModeLoad = debounce(() => {
-  window.dispatchEvent(new CustomEvent('codemirror-mode-load'))
-}, 300)
-
-export async function requireMode(mode: string) {
-  try {
-    await import(`codemirror/mode/${mode}/${mode}.js`)
-    dispatchModeLoad()
-  } catch (error) {
-    console.warn(error)
-  }
-}
 
 export function getCodeMirrorTheme(theme?: string) {
   if (theme == null) return 'default'
   if (theme === 'solarized-dark') return 'solarized dark'
   return theme
-}
-
-function loadMode(_CodeMirror: any) {
-  const memoizedModeResult = new Map<string, CodeMirror.ModeInfo | null>()
-  function findModeByMIME(mime: string) {
-    let result = memoizedModeResult.get(mime)
-    if (result === undefined) {
-      result = CodeMirror.findModeByMIME(mime) || null
-      memoizedModeResult.set(mime, result)
-    }
-    return result
-  }
-
-  const originalGetMode = CodeMirror.getMode
-  _CodeMirror.getMode = (config: CodeMirror.EditorConfiguration, mime: any) => {
-    const modeObj = originalGetMode(config, mime)
-    if (modeObj.name === 'null' && typeof mime === 'string') {
-      const mode = findModeByMIME(mime)
-      if (mode != null) {
-        requireMode(mode.mode)
-      }
-    }
-    return modeObj
-  }
 }
 
 // Initialize custom addons
