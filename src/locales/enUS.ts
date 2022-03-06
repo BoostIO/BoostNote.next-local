@@ -1,3 +1,5 @@
+import { lngKeys } from '../lib/i18n/types'
+
 export default {
   translation: {
     //General
@@ -12,6 +14,8 @@ export default {
     'general.save': 'Save',
     'general.default': 'Default',
     'general.networkError': 'Network Error',
+    [lngKeys.GeneralShowVerb]: 'Show',
+    [lngKeys.GeneralHideVerb]: 'Hide',
 
     // Navigator
     'navigator.noStorage': 'There are no spaces',
@@ -187,5 +191,20 @@ export default {
     'preferences.marginType': 'Margins',
     'preferences.pageSize': 'Page Size',
     'preferences.includeFrontMatter': 'Include Front Matter',
+
+    [lngKeys.SettingsShowEditorToolbar]: 'Editor Toolbar',
+    [lngKeys.EditorToolbarTooltipHeader]: 'Add header text',
+    [lngKeys.EditorToolbarTooltipAdmonition]: 'Add admonition',
+    [lngKeys.EditorToolbarTooltipCodefence]: 'Insert a codefence',
+    [lngKeys.EditorToolbarTooltipQuote]: 'Insert a quote',
+    [lngKeys.EditorToolbarTooltipList]: 'Add a bulleted list',
+    [lngKeys.EditorToolbarTooltipNumberedList]: 'Add a numbered list',
+    [lngKeys.EditorToolbarTooltipTaskList]: 'Add a task list',
+    [lngKeys.EditorToolbarTooltipBold]: 'Add bold text',
+    [lngKeys.EditorToolbarTooltipItalic]: 'Add italic text',
+    [lngKeys.EditorToolbarTooltipCode]: 'Insert code',
+    [lngKeys.EditorToolbarTooltipLink]: 'Add a link',
+    [lngKeys.EditorToolbarTooltipMath]: 'Add a math expression',
+    [lngKeys.EditorToolbarTooltipBrackets]: 'Add brackets',
   },
 }
