@@ -25,6 +25,10 @@ import AppNavigator from './organisms/AppNavigator'
 import Toast from '../shared/components/organisms/Toast'
 import styled from '../shared/lib/styled'
 import { useToast } from '../shared/lib/stores/toast'
+import {
+  applyBoldStyleEventEmitter,
+  applyItalicStyleEventEmitter,
+} from '../lib/events'
 
 const LoadingText = styled.div`
   margin: 30px;
@@ -154,6 +158,23 @@ const App = () => {
       removeIpcListener('create-local-space', createLocalSpaceHandler)
     }
   }, [togglePreferencesModal, push])
+
+  useEffectOnce(() => {
+    const applyBoldStyleIpcEventHandler = () => {
+      applyBoldStyleEventEmitter.dispatch()
+    }
+    const applyItalicStyleIpcEventHandler = () => {
+      applyItalicStyleEventEmitter.dispatch()
+    }
+
+    addIpcListener('apply-bold-style', applyBoldStyleIpcEventHandler)
+    addIpcListener('apply-italic-style', applyItalicStyleIpcEventHandler)
+
+    return () => {
+      removeIpcListener('apply-bold-style', applyBoldStyleIpcEventHandler)
+      removeIpcListener('apply-italic-style', applyItalicStyleIpcEventHandler)
+    }
+  })
 
   const switchWorkspaceHandler = useCallback(
     (_event: any, index: number) => {

@@ -505,6 +505,7 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
           addAttachments={addAttachments}
           viewMode={noteViewMode}
           initialCursorPosition={getCurrentPositionFromRoute()}
+          showEditorToolbar={preferences['editor.showEditorToolbar']}
         />
       )}
     </Application>

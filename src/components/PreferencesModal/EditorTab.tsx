@@ -12,7 +12,11 @@ import { themes } from '../../lib/CodeMirror'
 import CustomizedCodeEditor from '../atoms/CustomizedCodeEditor'
 import { useDebounce } from 'react-use'
 import Form from '../../shared/components/molecules/Form'
-import { SimpleFormSelect } from '../../shared/components/molecules/Form/atoms/FormSelect'
+import FormSelect, {
+  FormSelectOption,
+  SimpleFormSelect,
+} from '../../shared/components/molecules/Form/atoms/FormSelect'
+import { lngKeys } from '../../lib/i18n/types'
 
 const defaultPreviewContent = `# hello-world.js
 
@@ -101,6 +105,15 @@ const EditorTab = () => {
     [setPreferences]
   )
 
+  const selectShowEditorToolbar = useCallback(
+    (formOption: FormSelectOption) => {
+      setPreferences({
+        'editor.showEditorToolbar': formOption.value === 'Show',
+      })
+    },
+    [setPreferences]
+  )
+
   const codeEditorKeydownInterceptor = useMemo<KeyboardEventHandler>(() => {
     return (event) => {
       if (event.key === 'Escape') {
@@ -182,6 +195,34 @@ const EditorTab = () => {
                     value={preferences['editor.indentSize'] + ''}
                     onChange={selectEditorIndentSize}
                     options={['2', '4', '8']}
+                  />
+                ),
+              },
+            ],
+          },
+          {
+            title: t(lngKeys.SettingsShowEditorToolbar),
+            items: [
+              {
+                type: 'node',
+                element: (
+                  <FormSelect
+                    options={[
+                      {
+                        label: t(lngKeys.GeneralShowVerb),
+                        value: 'Show',
+                      },
+                      { label: t(lngKeys.GeneralHideVerb), value: 'Hide' },
+                    ]}
+                    value={{
+                      label: preferences['editor.showEditorToolbar']
+                        ? t(lngKeys.GeneralShowVerb)
+                        : t(lngKeys.GeneralHideVerb),
+                      value: preferences['editor.showEditorToolbar']
+                        ? 'Show'
+                        : 'Hide',
+                    }}
+                    onChange={selectShowEditorToolbar}
                   />
                 ),
               },

@@ -33,3 +33,11 @@ function createCustomEventEmitter<D = any>(name: string) {
 export const noteDetailFocusTitleInputEventEmitter = createCustomEventEmitter(
   'NoteDetail:focusTitleInput'
 )
+
+export const applyBoldStyleEventEmitter = createCustomEventEmitter(
+  'apply-bold-style'
+)
+
+export const applyItalicStyleEventEmitter = createCustomEventEmitter(
+  'apply-italic-style'
+)

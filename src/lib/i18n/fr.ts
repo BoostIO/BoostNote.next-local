@@ -55,6 +55,7 @@ const frTranslation: TranslationSource = {
   [lngKeys.SettingsNotifFrequencies]: 'Fréquence de mises à jour par mail',
   [lngKeys.SettingsIndentType]: "Type d'indentation pour l'éditeur",
   [lngKeys.SettingsIndentSize]: "Taille de l'indentation pour l'éditeur",
+  [lngKeys.SettingsShowEditorToolbar]: 'Editor Toolbar',
   [lngKeys.SettingsUserForum]: "Forum d'utilisateurs (nouveau!)",
   [lngKeys.ManagePreferences]: 'Gérez vos préférences.',
   [lngKeys.ManageProfile]: 'Gérez votre profil.',
@@ -278,6 +279,8 @@ const frTranslation: TranslationSource = {
   [lngKeys.EditorToolbarTooltipItalic]: 'Ajouter un texte en italique',
   [lngKeys.EditorToolbarTooltipCode]: 'Insérer du code',
   [lngKeys.EditorToolbarTooltipLink]: 'Ajouter un lien',
+  [lngKeys.EditorToolbarTooltipMath]: 'Ajouter une expression mathématique',
+  [lngKeys.EditorToolbarTooltipBrackets]: 'Add brackets',
   [lngKeys.EditorToolbarTooltipUpload]: 'Envoyer une image',
   [lngKeys.EditorToolbarTooltipTemplate]: 'Utiliser un template',
   [lngKeys.EditorToolbarTooltipScrollSyncEnable]:
