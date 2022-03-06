@@ -148,7 +148,7 @@ export default createGlobalStyle<BaseTheme>`
 
   /* scrollbar itself */
   ::-webkit-scrollbar-thumb {
-    background-color: ${({ theme }) => theme.colors.background.quaternary};
+    background-color: ${({ theme }) => theme.scroll.background};
   }
 
   /* set button(top and bottom of the scrollbar) */
@@ -192,6 +192,7 @@ export default createGlobalStyle<BaseTheme>`
     bottom: 15px;
     right: 15px;
   }
+
   #nprogress .spinner-icon {
     width: 18px;
     height: 18px;
@@ -203,14 +204,17 @@ export default createGlobalStyle<BaseTheme>`
     -webkit-animation: nprogress-spinner 400ms linear infinite;
     animation: nprogress-spinner 400ms linear infinite;
   }
+
   .nprogress-custom-parent {
     overflow: hidden;
     position: relative;
   }
+
   .nprogress-custom-parent #nprogress .spinner,
   .nprogress-custom-parent #nprogress .bar {
     position: absolute;
   }
+
   @-webkit-keyframes nprogress-spinner {
     0% {
       -webkit-transform: rotate(0deg);
@@ -219,6 +223,7 @@ export default createGlobalStyle<BaseTheme>`
       -webkit-transform: rotate(360deg);
     }
   }
+
   @keyframes nprogress-spinner {
     0% {
       transform: rotate(0deg);
