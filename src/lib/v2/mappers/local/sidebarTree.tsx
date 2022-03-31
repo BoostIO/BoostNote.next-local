@@ -44,7 +44,11 @@ import {
   isDirectSubPathname,
   values,
 } from '../../../db/utils'
-import { SidebarTreeSortingOrder } from '../../../../shared/lib/sidebar'
+import {
+  SidebarTreeLabelSortingOrder,
+  SidebarTreeLabelSortingOrders,
+  SidebarTreeSortingOrder,
+} from '../../../../shared/lib/sidebar'
 import {
   CreateFolderRequestBody,
   CreateNoteRequestBody,
@@ -59,6 +63,7 @@ import {
 } from '../../../../shared/components/organisms/Sidebar/molecules/SidebarTree'
 import { FOLDER_ID_PREFIX } from '../../../db/consts'
 import copy from 'copy-to-clipboard'
+import { mapControlsToPopup } from '../../../../shared/components/organisms/Sidebar/atoms/SidebarHeader'
 
 type LocalTreeItem = {
   id: string
@@ -85,6 +90,46 @@ type LocalTreeItem = {
 
 function compareStringStart(a: string, b: string, prefix: string) {
   return ~~b.startsWith(prefix) - ~~a.startsWith(prefix)
+}
+
+function sortLabels(
+  sortingOrder: SidebarTreeLabelSortingOrder,
+  a: TagDoc,
+  b: TagDoc,
+  numberOfTagsA: number,
+  numberOfTagsB: number
+) {
+  switch (sortingOrder) {
+    case 'created-date-asc':
+      return a.createdAt.localeCompare(b.createdAt)
+    case 'created-date-dsc':
+      return -a.createdAt.localeCompare(b.createdAt)
+    case 'a-z':
+      if (a._id.trim() === '' && b._id.trim() !== '') {
+        return 1
+      }
+      if (b._id.trim() === '' && a._id.trim() !== '') {
+        return -1
+      }
+      return a._id.localeCompare(b._id)
+    case 'z-a':
+      if (a._id.trim() === '' && b._id.trim() !== '') {
+        return 1
+      }
+      if (b._id.trim() === '' && a._id.trim() !== '') {
+        return -1
+      }
+      return -a._id.localeCompare(b._id)
+    case 'updated-date-asc':
+      return a.updatedAt.localeCompare(b.updatedAt)
+    case 'count-dsc':
+      return numberOfTagsB - numberOfTagsA
+    case 'count-asc':
+      return numberOfTagsA - numberOfTagsB
+    case 'updated-date-dsc':
+    default:
+      return -a.updatedAt.localeCompare(b.updatedAt)
+  }
 }
 
 function sortTreeItems<
@@ -168,6 +213,8 @@ export function mapTreeControls(
 export function mapTree(
   initialLoadDone: boolean,
   sortingOrder: SidebarTreeSortingOrder,
+  labelSortingOrder: SidebarTreeLabelSortingOrder,
+  labelSetSortingOrder: (newSortValue: SidebarTreeLabelSortingOrder) => void,
   workspace: NoteStorage,
   docMap: ObjectMap<NoteDoc>,
   folderMap: ObjectMap<FolderDoc>,
@@ -489,14 +536,15 @@ export function mapTree(
 
   const labels = values(labelMap)
     .filter((tag) => (notesPerLabelIdMap.get(tag._id) || []).length > 0)
-    .sort((a, b) => {
-      if (a._id < b._id) {
-        // tag._id == tagName
-        return -1
-      } else {
-        return 1
-      }
-    })
+    .sort((a, b) =>
+      sortLabels(
+        labelSortingOrder,
+        a,
+        b,
+        (notesPerLabelIdMap.get(a._id) || []).length,
+        (notesPerLabelIdMap.get(b._id) || []).length
+      )
+    )
     .reduce((acc, val) => {
       const tagName = getTagName(val._id)
       const href = getLabelHref(workspace, tagName)
@@ -546,10 +594,24 @@ export function mapTree(
     ],
     contextControls: mapTreeControls(workspace, exportDocuments),
   })
+
+  const sidebarSortingControls = mapControlsToPopup({
+    Sorting: Object.values(SidebarTreeLabelSortingOrders).map((sort) => {
+      return {
+        type: 'radio',
+        label: sort.label,
+        icon: sort.icon,
+        checked: sort.value === labelSortingOrder,
+        onClick: () => labelSetSortingOrder(sort.value),
+      }
+    }),
+  })
+
   if (labels.length > 0) {
     tree.push({
       label: 'Labels',
       rows: labels,
+      contextControls: [...sidebarSortingControls],
     })
   }
 
