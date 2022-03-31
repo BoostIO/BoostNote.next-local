@@ -4,7 +4,10 @@ import { useSetState } from 'react-use'
 import { generalStatusKey } from './localStorageKeys'
 import { createStoreContext } from './context'
 import { getFolderItemId, getStorageItemId } from './nav'
-import { SidebarTreeSortingOrder } from '../shared/lib/sidebar'
+import {
+  SidebarTreeLabelSortingOrder,
+  SidebarTreeSortingOrder,
+} from '../shared/lib/sidebar'
 
 export type ViewModeType = 'edit' | 'preview' | 'split'
 
@@ -16,6 +19,7 @@ export interface GeneralStatus {
   sideNavOpenedItemList: string[]
   showingNoteContextMenu: boolean
   sidebarTreeSortingOrder: SidebarTreeSortingOrder
+  sidebarTreeLabelSortingOrder: SidebarTreeLabelSortingOrder
   focusOnEditorCursor: boolean
 }
 
@@ -45,6 +49,7 @@ const baseGeneralStatus: GeneralStatus = {
   sideNavOpenedItemList: [],
   showingNoteContextMenu: false,
   sidebarTreeSortingOrder: 'last-updated',
+  sidebarTreeLabelSortingOrder: 'a-z',
   focusOnEditorCursor: false,
 }
 

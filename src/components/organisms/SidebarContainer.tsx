@@ -22,7 +22,10 @@ import { useTranslation } from 'react-i18next'
 import { useSearchModal } from '../../lib/searchModal'
 import styled from '../../shared/lib/styled'
 import cc from 'classcat'
-import { SidebarTreeSortingOrders } from '../../shared/lib/sidebar'
+import {
+  SidebarTreeLabelSortingOrder,
+  SidebarTreeSortingOrders,
+} from '../../shared/lib/sidebar'
 import { useGeneralStatus } from '../../lib/generalStatus'
 import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
 import { mapTree } from '../../lib/v2/mappers/local/sidebarTree'
@@ -297,6 +300,11 @@ const SidebarContainer = ({
     return mapTree(
       initialLoadDone,
       generalStatus.sidebarTreeSortingOrder,
+      generalStatus.sidebarTreeLabelSortingOrder,
+      (newSortValue: SidebarTreeLabelSortingOrder) =>
+        setGeneralStatus({
+          sidebarTreeLabelSortingOrder: newSortValue,
+        }),
       workspace,
       workspace.noteMap,
       workspace.folderMap,
@@ -324,6 +332,8 @@ const SidebarContainer = ({
     workspace,
     initialLoadDone,
     generalStatus.sidebarTreeSortingOrder,
+    generalStatus.sidebarTreeLabelSortingOrder,
+    setGeneralStatus,
     pathname,
     sideBarOpenedLinksIdsSet,
     sideBarOpenedFolderIdsSet,

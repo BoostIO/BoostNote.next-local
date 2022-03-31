@@ -81,7 +81,7 @@ const SidebarHeader: AppComponent<SidebarHeaderProps> = ({
   )
 }
 
-function mapControlsToPopup(controls: SidebarControls) {
+export function mapControlsToPopup(controls: SidebarControls) {
   const items: MenuItem[] = []
 
   Object.entries(controls).forEach(([category, value]) => {
@@ -110,7 +110,7 @@ function mapControlsToPopup(controls: SidebarControls) {
   return items
 }
 
-const PopupCategory = styled.div`
+export const PopupCategory = styled.div`
   padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
   color: ${({ theme }) => theme.colors.text.subtle};
   font-size: ${({ theme }) => theme.sizes.fonts.df}px;
