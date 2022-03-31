@@ -9,13 +9,17 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 
 ## [Unreleased]
 
-## [0.23.0] - 2021-10-20
+## [0.23.0] - 2022-03-31
 
 ### Added
 
 - The welcome note on space creation or import
 - Markdown Preview option to enlarge image on click
 - Attachments page enlarge image on click
+- Archive all documents
+- Label sorting option
+- Editor Toolbar (can be hidden from preferences)
+- Note linking
 
 ### Fixed
 
@@ -23,6 +27,8 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Focus title not working
 - Auto-focus on opening rename or other modal dialogs with form inputs
 - Attachments context menu open button not working (open on disk works now)
+- Markdown Preview checkbox update makes editor out of focus (and resets cursor)
+- Scrollbar colors
 
 ## [Released]
 
