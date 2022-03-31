@@ -70,7 +70,7 @@ interface MarkdownPreviewerProps {
   attachmentMap?: ObjectMap<Attachment>
   updateContent?: (
     newContentOrUpdater: string | ((newValue: string) => string),
-    checkboxUpdate?: boolean
+    refocusEditorAndCursor?: boolean
   ) => void
 }
 

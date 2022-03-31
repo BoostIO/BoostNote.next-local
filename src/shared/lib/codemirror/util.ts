@@ -41,3 +41,12 @@ export function loadMode(_CodeMirror: any) {
     return modeObj
   }
 }
+
+export function scrollEditorToLine(
+  editor: CodeMirror.EditorFromTextArea,
+  lineNumber: number
+) {
+  const t = editor.charCoords({ line: lineNumber, ch: 0 }, 'local').top
+  const middleHeight = editor.getScrollerElement().offsetHeight / 2
+  editor.scrollTo(null, t - middleHeight - 5)
+}

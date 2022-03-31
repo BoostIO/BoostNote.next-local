@@ -5,7 +5,7 @@ interface MarkdownCheckboxProps {
   checked?: boolean
   updateContent?: (
     newValueOrUpdater: string | ((prevValue: string) => string),
-    checkboxUpdate?: boolean
+    refocusEditorAndCursor?: boolean
   ) => void
 }
 
