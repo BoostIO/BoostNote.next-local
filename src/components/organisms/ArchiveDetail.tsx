@@ -15,6 +15,10 @@ import {
   selectStyle,
 } from '../../shared/lib/styled/styleFunctions'
 import Icon from '../../shared/components/atoms/Icon'
+import Button from '../../shared/components/atoms/Button'
+import { useDb } from '../../lib/db'
+import { DialogIconTypes, useDialog } from '../../shared/lib/stores/dialog'
+import { useToast } from '../../shared/lib/stores/toast'
 
 interface TrashDetailProps {
   storage: NoteStorage
@@ -24,6 +28,9 @@ const ArchiveDetail = ({ storage }: TrashDetailProps) => {
   const { preferences, setPreferences } = usePreferences()
   const noteSorting = preferences['general.noteSorting']
   const { t } = useTranslation()
+  const { purgeNote } = useDb()
+  const { messageBox } = useDialog()
+  const { pushMessage } = useToast()
 
   const notes = useMemo(() => {
     return values(storage.noteMap)
@@ -68,6 +75,39 @@ const ArchiveDetail = ({ storage }: TrashDetailProps) => {
     [setPreferences]
   )
 
+  const removeAllArchivedNotes = useCallback(() => {
+    messageBox({
+      title: t('note.delete'),
+      message:
+        'This operation is not reversible. Are you sure you want to permanently remove all archived notes?',
+      iconType: DialogIconTypes.Warning,
+      buttons: [
+        {
+          variant: 'warning',
+          label: t('note.delete'),
+          onClick: async () => {
+            try {
+              for (const note of notes) {
+                purgeNote(storage.id, note._id)
+              }
+            } catch {
+              pushMessage({
+                title: t('general.networkError'),
+                description: `An error occurred while removing notes.`,
+              })
+            }
+          },
+        },
+        {
+          label: t('general.cancel'),
+          cancelButton: true,
+          defaultButton: true,
+          variant: 'secondary',
+        },
+      ],
+    })
+  }, [messageBox, notes, purgeNote, pushMessage, storage.id, t])
+
   if (notes.length === 0) {
     return (
       <NoArchivedItemsContainer>
@@ -85,7 +125,17 @@ const ArchiveDetail = ({ storage }: TrashDetailProps) => {
         {t('general.archive')}
       </Header>
       <Control>
-        <div className='left' />
+        <div className='left'>
+          <div>
+            <Button
+              size={'sm'}
+              variant={'danger'}
+              onClick={() => removeAllArchivedNotes()}
+            >
+              Remove All
+            </Button>
+          </div>
+        </div>
         <div className='right'>
           <select onChange={selectNoteSorting} value={noteSorting}>
             {<NoteSortingOptionsFragment />}
