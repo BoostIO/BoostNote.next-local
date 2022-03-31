@@ -20,7 +20,7 @@ import EditorThemeSelect from '../molecules/EditorThemeSelect'
 import EditorKeyMapSelect from '../molecules/EditorKeyMapSelect'
 import { addIpcListener, removeIpcListener } from '../../lib/electronOnly'
 import { MarkerRange } from 'codemirror'
-import LocalSearch, { scrollEditorToLine } from './LocalSearch'
+import LocalSearch from './LocalSearch'
 import { SearchReplaceOptions } from '../../lib/search/search'
 import {
   borderTop,
@@ -29,6 +29,7 @@ import {
 } from '../../shared/lib/styled/styleFunctions'
 import styled from '../../shared/lib/styled'
 import EditorToolbar, { formatCodeMirrorText } from './editor/EditorToolbar'
+import { scrollEditorToLine } from '../../shared/lib/codemirror/util'
 
 type NoteDetailProps = {
   note: NoteDoc
@@ -164,6 +165,10 @@ class NoteDetail extends React.Component<NoteDetailProps, NoteDetailState> {
   }
 
   setInitialCursor() {
+    this.setCursorToLastPositionOrInit()
+  }
+
+  setCursorToLastPositionOrInit() {
     if (this.codeMirror == null) {
       return
     }
@@ -223,7 +228,7 @@ class NoteDetail extends React.Component<NoteDetailProps, NoteDetailState> {
 
   updateContent = (
     newValueOrUpdater: string | ((prevValue: string) => string),
-    checkboxUpdate = false
+    refocusEditorAndCursor = false
   ) => {
     const updater =
       typeof newValueOrUpdater === 'string'
@@ -236,9 +241,9 @@ class NoteDetail extends React.Component<NoteDetailProps, NoteDetailState> {
         }
       },
       () => {
-        if (this.codeMirror != null && checkboxUpdate) {
+        if (this.codeMirror != null && refocusEditorAndCursor) {
           this.codeMirror.focus()
-          this.setInitialCursor()
+          this.setCursorToLastPositionOrInit()
         }
         this.queueToSave()
       }

@@ -32,6 +32,7 @@ import { compareEventKeyWithKeymap } from '../../lib/keymap'
 import { usePreferences } from '../../lib/preferences'
 import styled from '../../shared/lib/styled'
 import Icon from '../../shared/components/atoms/Icon'
+import { scrollEditorToLine } from '../../shared/lib/codemirror/util'
 
 const LOCAL_SEARCH_MAX_RESULTS = 10000
 
@@ -50,15 +51,6 @@ interface LocalSearchProps {
 }
 
 export type SearchResultNavigationDirection = 'next' | 'previous'
-
-export function scrollEditorToLine(
-  editor: CodeMirror.EditorFromTextArea,
-  lineNumber: number
-) {
-  const t = editor.charCoords({ line: lineNumber, ch: 0 }, 'local').top
-  const middleHeight = editor.getScrollerElement().offsetHeight / 2
-  editor.scrollTo(null, t - middleHeight - 5)
-}
 
 const LocalSearch = ({
   searchQuery,
