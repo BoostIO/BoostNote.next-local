@@ -13,7 +13,10 @@ import {
   inspectDataTransfer,
   convertFileListToArray,
 } from '../../lib/dom'
-import CodeMirror, { EditorPosition } from '../../lib/CodeMirror'
+import CodeMirror, {
+  EditorPosition,
+  getModeSuggestions,
+} from '../../lib/CodeMirror'
 import EditorSelectionStatus from '../molecules/EditorSelectionStatus'
 import EditorIndentationStatus from '../molecules/EditorIndentationStatus'
 import EditorThemeSelect from '../molecules/EditorThemeSelect'
@@ -357,7 +360,35 @@ class NoteDetail extends React.Component<NoteDetailProps, NoteDetailState> {
     )
   }
 
+  handleCursorShowHintActivity = (cm: CodeMirror.Editor) => {
+    const currentCursor = cm.getCursor()
+    const cursorColumn = currentCursor.ch
+    const currentLine = cm.getLine(cm.getCursor().line) || ''
+    const previousCursor = this.state.currentCursor
+    const cursorsEqual =
+      currentCursor.ch == previousCursor.ch &&
+      currentCursor.line == previousCursor.line
+    if (
+      !cm.state.completeActive &&
+      // user has started with '```x' and is waiting for options
+      currentLine.startsWith('```') &&
+      currentLine.length >= 4 &&
+      cursorColumn >= 3 &&
+      !cursorsEqual
+    ) {
+      const inputWord = currentLine.substring(3)
+      const modeSuggestions = getModeSuggestions(inputWord)
+      const isOnlySuggestion =
+        modeSuggestions.length == 1 && modeSuggestions[0].text == inputWord
+      if (!isOnlySuggestion) {
+        cm.showHint()
+      }
+    }
+  }
+
   handleCursorActivity = (codeMirror: CodeMirror.Editor) => {
+    this.handleCursorShowHintActivity(codeMirror)
+
     const doc = codeMirror.getDoc()
     const { line, ch } = doc.getCursor()
     const selections = doc.listSelections()

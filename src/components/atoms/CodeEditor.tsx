@@ -1,5 +1,8 @@
 import React from 'react'
-import { getCodeMirrorTheme } from '../../lib/CodeMirror'
+import {
+  CodeMirrorEditorModeHints,
+  getCodeMirrorTheme,
+} from '../../lib/CodeMirror'
 import {
   EditorIndentTypeOptions,
   EditorIndentSizeOptions,
@@ -127,6 +130,12 @@ class CodeEditor extends React.Component<CodeEditorProps> {
       readOnly: this.props.readonly === true,
       extraKeys: extraKeys,
       scrollPastEnd: true,
+      hintOptions: {
+        hint: CodeMirrorEditorModeHints,
+        completeSingle: false,
+        alignWithWord: false,
+        closeCharacters: /[\s()\[\]{};:>,\n]/,
+      },
     })
     this.codeMirror.on('change', this.handleCodeMirrorChange)
     window.addEventListener('codemirror-mode-load', this.reloadMode)
@@ -256,6 +265,7 @@ class CodeEditor extends React.Component<CodeEditorProps> {
           return this.handleOnLocalSearchReplaceToggle(cm, false)
         }
       },
+      'Ctrl-Space': 'autocomplete',
     }
     extraKeys[localSearchShortcut] = (cm: CodeMirror.Editor) =>
       this.handleOnLocalSearchToggle(cm, true)
