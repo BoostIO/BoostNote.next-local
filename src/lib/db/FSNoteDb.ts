@@ -30,6 +30,7 @@ import {
   keys,
   getFolderPathname,
   generateFolderId,
+  isNoteValidBySchema,
 } from './utils'
 import { escapeRegExp, generateId, getHexatrigesimalString } from '../string'
 import {
@@ -72,15 +73,22 @@ class FSNoteDb implements NoteDb {
     const missingFolderPathnameSet = new Set<string>()
     const missingTagNameSet = new Set<string>()
     for (const note of notes) {
-      if (note.trashed) {
-        continue
-      }
-      missingFolderPathnameSet.add(note.folderPathname)
-      note.tags.forEach((tag) => {
-        if (this.data!.tagMap[tag] == null) {
-          missingTagNameSet.add(tag)
+      try {
+        if (note.trashed) {
+          continue
         }
-      })
+        missingFolderPathnameSet.add(note.folderPathname)
+        note.tags.forEach((tag) => {
+          if (this.data!.tagMap[tag] == null) {
+            missingTagNameSet.add(tag)
+          }
+        })
+      } catch (e) {
+        console.warn(
+          `Skipping note file because it is not valid JSON note document`
+        )
+        console.log(note)
+      }
     }
 
     if (newStorage) {
@@ -797,7 +805,14 @@ class FSNoteDb implements NoteDb {
         const rawDoc = await readFileAsString(
           join(this.location, 'notes', noteFileName)
         )
-        notes.push(JSON.parse(rawDoc) as NoteDoc)
+        const note = JSON.parse(rawDoc) as NoteDoc
+        if (isNoteValidBySchema(note)) {
+          notes.push(note)
+        } else {
+          console.warn(
+            `[WARNING] Invalid note found ${noteFileName}. Please check if the file is a valid, non-corrupted note data.`
+          )
+        }
       } catch (error) {
         console.error(error)
       }
