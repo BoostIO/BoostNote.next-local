@@ -20,6 +20,7 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Label sorting option
 - Editor Toolbar (can be hidden from preferences)
 - Note linking
+- Code Mirror mode hint for code block
 
 ### Fixed
 
