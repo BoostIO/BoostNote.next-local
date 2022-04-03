@@ -21,6 +21,7 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Editor Toolbar (can be hidden from preferences)
 - Note linking
 - Code Mirror mode hint for code block
+- Add space location open destination button in Preferences
 
 ### Fixed
 
@@ -30,6 +31,7 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Attachments context menu open button not working (open on disk works now)
 - Markdown Preview checkbox update makes editor out of focus (and resets cursor)
 - Scrollbar colors
+- Add import from legacy feature
 
 ## [Released]
 
