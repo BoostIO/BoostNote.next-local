@@ -135,7 +135,10 @@ class FSNoteDb implements NoteDb {
         `pathname is invalid, got \`${pathname}\``
       )
     }
-    if (pathname !== '/' && skipParentFolderCreation === false) {
+    if (
+      (pathname !== '/' && skipParentFolderCreation === false) ||
+      skipParentFolderCreation === undefined
+    ) {
       await this.doesParentFolderExistOrCreate(pathname)
     }
 

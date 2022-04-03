@@ -229,7 +229,7 @@ const ImportLegacyNotesForm = ({ storageId }: ImportLegacyNotesFormProps) => {
       }
 
       setDoneMessage(
-        `The notes are imported to ${destinationFolderPathname}${
+        `The notes are imported to '${destinationFolderPathname}'. You might need to refresh the app to see all notes.${
           invalidCsonFilePathnames.length > 0
             ? ` (${invalidCsonFilePathnames.length} invalid file(s). Please check console in developer tool to know more)`
             : ''
