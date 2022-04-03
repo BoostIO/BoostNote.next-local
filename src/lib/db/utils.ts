@@ -16,6 +16,8 @@ import {
   LiteStorageStorageItem,
 } from './types'
 import { generateId, escapeRegExp } from '../string'
+import { isValid, schema } from '../predicates'
+import ow from 'ow'
 
 export function values<T>(objectMap: ObjectMap<T>): T[] {
   return Object.values(objectMap) as T[]
@@ -259,4 +261,22 @@ export function mapStorageToLiteStorageData(
     name,
     location: storage.location,
   }
+}
+
+const noteDocPredicate = schema({
+  _id: ow.string,
+  title: ow.string,
+  content: ow.string,
+  folderPathname: ow.string,
+  tags: ow.array.ofType(ow.string),
+  data: ow.object,
+  createdAt: ow.string,
+  updatedAt: ow.string,
+  archivedAt: ow.optional.string,
+  trashed: ow.boolean,
+  _rev: ow.string,
+})
+
+export function isNoteValidBySchema(note: NoteDoc) {
+  return isValid(note, noteDocPredicate)
 }
