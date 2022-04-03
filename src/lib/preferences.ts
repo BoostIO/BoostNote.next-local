@@ -31,7 +31,7 @@ export type PreferencesTab =
   | 'export'
   | 'sponsor'
   | 'storage'
-  | 'migration'
+  | 'import'
   | 'general'
 export enum MarginType {
   DefaultMargins = 0,
