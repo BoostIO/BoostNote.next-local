@@ -15,6 +15,7 @@ import { useToast } from '../../shared/lib/stores/toast'
 import Button from '../../shared/components/atoms/Button'
 import styled from '../../shared/lib/styled'
 import { useDialog, DialogIconTypes } from '../../shared/lib/stores/dialog'
+import { openPath } from '../../lib/electronOnly'
 
 interface StorageEditPageProps {
   storage: NoteStorage
@@ -64,11 +65,25 @@ const StorageEditPage = ({ storage }: StorageEditPageProps) => {
     db.renameStorage(storage.id, newName)
   }, [storage.id, db, newName])
 
+  const openStorageLocation = useCallback(() => {
+    openPath(storage.location + '/', false)
+  }, [storage])
+
   return (
     <div>
       <h2>Space Settings</h2>
-      <p>Location: {storage.location}</p>
-
+      <FormLabelGroup>
+        <FormLabelGroupLabel>Location</FormLabelGroupLabel>
+        <FormLabelGroupContent>
+          <Button
+            className={'storage--location-button-style'}
+            variant={'secondary'}
+            onClick={openStorageLocation}
+          >
+            {storage.location}
+          </Button>
+        </FormLabelGroupContent>
+      </FormLabelGroup>
       <FormLabelGroup>
         <FormLabelGroupLabel>Space Name</FormLabelGroupLabel>
         <FormLabelGroupContent>
