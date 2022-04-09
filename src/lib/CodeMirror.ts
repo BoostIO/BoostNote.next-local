@@ -190,10 +190,15 @@ const supportedModeSuggestions: SuggestionModeType = {
   ],
   i: [{ autocomplete: 'idl', displayText: 'IDL' }],
   j: [
-    { autocomplete: 'js', displayText: 'Javascript' },
+    {
+      autocomplete: 'js',
+      displayText: 'Javascript',
+      compareText: 'javascript',
+    },
     { autocomplete: 'jinja2', displayText: 'Jinja2' },
     { autocomplete: 'jsx', displayText: 'Javascript (JSX)' },
     { autocomplete: 'julia', displayText: 'Julia' },
+    { autocomplete: 'java', displayText: 'Java' },
   ],
   l: [
     { autocomplete: 'livescript', displayText: 'Livescript' },
@@ -278,6 +283,11 @@ const supportedModeSuggestions: SuggestionModeType = {
     { autocomplete: 'ttcn-cfg', displayText: 'TTCN Configuration' },
     { autocomplete: 'turtle', displayText: 'Turtle' },
     { autocomplete: 'twig', displayText: 'Twig' },
+    {
+      autocomplete: 'ts',
+      displayText: 'Typescript',
+      compareText: 'typescript',
+    },
   ],
   v: [
     { autocomplete: 'vb', displayText: 'VB.NET' },
