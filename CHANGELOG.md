@@ -9,7 +9,23 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 
 ## [Unreleased]
 
-## [0.23.0] - 2022-03-31
+## [0.24.0] - 2022-06-01
+
+### [todo]
+- Add TOC
+- Editor newlines
+- Editor rulers
+- Tabs or multiple windows
+- Doc templates
+- Import Markdown Data
+- Consideration for Mobile App and Markdown raw files (no JSON)
+
+### Fixed
+- Add missing code block hints
+
+## [Released]
+
+## [0.23.0] - 2022-04-13
 
 ### Added
 
@@ -32,8 +48,6 @@ For more info on features and upcoming changes, please visit our [Open Issues](h
 - Markdown Preview checkbox update makes editor out of focus (and resets cursor)
 - Scrollbar colors
 - Add import from legacy feature
-
-## [Released]
 
 ## [0.22.3] - 2021-09-24
 
