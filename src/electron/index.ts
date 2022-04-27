@@ -26,6 +26,7 @@ const keymap = new Map<string, string>([
   ['toggleSplitEditMode', 'Ctrl + \\'],
   ['togglePreviewMode', 'Ctrl + E'],
   ['editorSaveAs', 'Ctrl + S'],
+  ['closeWindow', 'Ctrl + W'],
 ])
 
 function applyMenuTemplate(template: MenuItemConstructorOptions[]) {

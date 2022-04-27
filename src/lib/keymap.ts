@@ -158,6 +158,23 @@ export const defaultKeymap = new Map<string, KeymapItem>([
       isMenuType: false,
     },
   ],
+  [
+    'closeWindow',
+    {
+      shortcutMainStroke: {
+        key: 'W',
+        keycode: 87,
+        modifiers:
+          osName === 'macos'
+            ? { meta: true }
+            : {
+                ctrl: true,
+              },
+      },
+      description: 'Closes currently opened window',
+      isMenuType: true,
+    },
+  ],
 ])
 
 export function compareEventKeyWithKeymap(
