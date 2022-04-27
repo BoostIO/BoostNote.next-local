@@ -298,9 +298,9 @@ export function getTemplateFromKeymap(
               { type: 'separator' },
               { role: 'front' },
               { type: 'separator' },
-              { role: 'window' },
+              { role: 'window', accelerator: keymap.get('closeWindow') },
             ]
-          : [{ role: 'close' }]),
+          : [{ role: 'close', accelerator: keymap.get('closeWindow') }]),
       ] as MenuItemConstructorOptions[],
     },
     {
