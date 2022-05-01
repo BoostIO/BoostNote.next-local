@@ -239,6 +239,7 @@ export function mapTree(
     docId: string,
     archived: boolean
   ) => void,
+  removeLabel: (workspaceId: string, tagName: string) => void,
   deleteFolder: (target: {
     workspaceId: string
     pathname: string
@@ -253,6 +254,7 @@ export function mapTree(
   ) => void,
   openRenameFolderForm: (workspaceId: string, folder: FolderDoc) => void,
   openRenameNoteForm: (workspaceId: string, doc: NoteDoc) => void,
+  openRenameLabelForm: (workspaceId: string, tagName: string) => void,
   exportDocuments: (
     workspace: NoteStorage,
     exportSettings: LocalExportResourceRequestBody
@@ -556,6 +558,30 @@ export function mapTree(
         href,
         active: href === currentPathWithWorkspace,
         navigateTo: () => push(href),
+        contextControls: [
+          {
+            type: MenuTypes.Normal,
+            icon: mdiPencil,
+            label: 'Rename',
+            onClick: () => openRenameLabelForm(workspace.id, tagName),
+          },
+          {
+            type: MenuTypes.Normal,
+            label: 'Export Label',
+            icon: mdiExport,
+            onClick: () =>
+              exportDocuments(workspace, {
+                labelName: `${tagName}`,
+                exportingStorage: false,
+              }),
+          },
+          {
+            type: MenuTypes.Normal,
+            icon: mdiTrashCanOutline,
+            label: 'Remove',
+            onClick: () => removeLabel(workspace.id, tagName),
+          },
+        ],
       })
       return acc
     }, [] as SidebarTreeChildRow[])

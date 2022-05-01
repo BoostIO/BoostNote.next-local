@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { mdiFileDocumentOutline, mdiFolderOutline, mdiPencil } from '@mdi/js'
+import {
+  mdiFileDocumentOutline,
+  mdiFolderOutline,
+  mdiLabelOutline,
+  mdiPencil,
+} from '@mdi/js'
 import { FolderDoc, NoteDoc, NoteStorage } from '../../db/types'
 import { useDb } from '../../db'
 import {
@@ -40,6 +45,8 @@ export function useLocalUI() {
     renameStorage,
     removeStorage,
     removeAttachment,
+    removeTag,
+    renameTag,
   } = useDb()
   const { pushMessage } = useToast()
   const { push } = useRouter()
@@ -97,6 +104,53 @@ export function useLocalUI() {
       renameStorage,
       t,
     ]
+  )
+
+  const openRenameLabelForm = useCallback(
+    (workspaceId: string, labelName: string) => {
+      setOpeningModal(true)
+      openModal(
+        <BasicInputFormLocal
+          inputRef={inputRef}
+          defaultIcon={mdiLabelOutline}
+          defaultInputValue={labelName}
+          placeholder='Label name'
+          submitButtonProps={{
+            label: 'Update',
+          }}
+          onSubmit={async (newLabelName: string) => {
+            if (newLabelName == '') {
+              pushMessage({
+                title: 'Cannot rename label',
+                description: 'Label name should not be empty.',
+              })
+              closeModalAndUpdateState()
+              return
+            }
+            await renameTag(workspaceId, labelName, newLabelName).catch(
+              (err) => {
+                pushMessage({
+                  title: 'Cannot rename label',
+                  description:
+                    err != null
+                      ? err.message != null
+                        ? err.message
+                        : `${err}`
+                      : 'Unknown error',
+                })
+              }
+            )
+            closeModalAndUpdateState()
+          }}
+          onCancel={() => closeModalAndUpdateState()}
+        />,
+        {
+          showCloseIcon: true,
+          title: 'Rename label',
+        }
+      )
+    },
+    [openModal, inputRef, renameTag, closeModalAndUpdateState, pushMessage]
   )
 
   const openRenameFolderForm = useCallback(
@@ -470,6 +524,32 @@ export function useLocalUI() {
     [messageBox, removeAttachment]
   )
 
+  const removeLabelForm = useCallback(
+    (workspaceId: string, labelName: string) => {
+      messageBox({
+        title: `Delete ${labelName}`,
+        message: `Are you sure you want to delete this label?`,
+        iconType: DialogIconTypes.Warning,
+        buttons: [
+          {
+            variant: 'secondary',
+            label: 'Cancel',
+            cancelButton: true,
+            defaultButton: true,
+          },
+          {
+            variant: 'danger',
+            label: 'Delete',
+            onClick: async () => {
+              await removeTag(workspaceId, labelName)
+            },
+          },
+        ],
+      })
+    },
+    [messageBox, removeTag]
+  )
+
   return {
     openWorkspaceEditForm,
     openNewDocForm,
@@ -481,6 +561,8 @@ export function useLocalUI() {
     deleteOrTrashNote: deleteOrArchiveDoc,
     exportDocuments,
     removeAttachment: removeAttachmentApi,
+    openRenameLabelForm,
+    removeLabelForm,
   }
 }
 
@@ -491,7 +573,8 @@ export interface LocalNewResourceRequestBody {
 }
 
 export interface LocalExportResourceRequestBody {
-  folderName: string
-  folderPathname: string
+  folderName?: string
+  folderPathname?: string
+  labelName?: string
   exportingStorage: boolean
 }
