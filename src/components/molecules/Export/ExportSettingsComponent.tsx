@@ -54,7 +54,7 @@ const ExportSettingsComponent = ({
               },
             ],
           },
-          ...((!exportSettings.exportingStorage
+          ...((!exportSettings.exportingStorage && !exportSettings.labelName
             ? [
                 {
                   title: 'Export sub-folders or just selected folder',

@@ -33,8 +33,9 @@ import styled from '../../../shared/lib/styled'
 import { border } from '../../../shared/lib/styled/styleFunctions'
 
 export interface ExportProcedureData {
-  folderName: string
-  folderPathname: string
+  folderName?: string
+  folderPathname?: string
+  labelName?: string
   exportType: string
   recursive: boolean
   exportingStorage: boolean
@@ -136,7 +137,11 @@ const ExportProgressItem = ({
   }, [])
 
   const createExportDirectories = useCallback(
-    async (folderMap: ObjectMap<FolderDoc>, rootDir: string) => {
+    async (
+      folderMap: ObjectMap<FolderDoc>,
+      rootDir: string,
+      startFolder: string
+    ) => {
       for (const folderPath of keys(folderMap)) {
         if (isExportingCanceled()) {
           return
@@ -164,9 +169,7 @@ const ExportProgressItem = ({
 
         const fullPath = join(
           rootDir,
-          folderPath.substring(
-            folderPath.indexOf(exportProcedureData.folderName)
-          )
+          folderPath.substring(folderPath.indexOf(startFolder))
         )
 
         setExportState({
@@ -180,7 +183,6 @@ const ExportProgressItem = ({
     },
     [
       exportProcedureData.exportingStorage,
-      exportProcedureData.folderName,
       exportProcedureData.folderPathname,
       exportProcedureData.recursive,
       isExportingCanceled,
@@ -197,6 +199,13 @@ const ExportProgressItem = ({
       const notesToExport: NoteDoc[] = []
       for (const [, noteDoc] of entries(noteMap)) {
         if (noteDoc.trashed) {
+          continue
+        }
+        if (
+          exportProcedureData.labelName &&
+          noteDoc.tags.indexOf(exportProcedureData.labelName) != -1
+        ) {
+          notesToExport.push(noteDoc)
           continue
         }
         if (
@@ -222,6 +231,31 @@ const ExportProgressItem = ({
     [
       exportProcedureData.exportingStorage,
       exportProcedureData.folderPathname,
+      exportProcedureData.labelName,
+      exportProcedureData.recursive,
+    ]
+  )
+
+  const getNoteFolderLocation = useCallback(
+    (noteDoc) => {
+      if (
+        exportProcedureData.folderName &&
+        exportProcedureData.folderPathname
+      ) {
+        return exportProcedureData.recursive
+          ? noteDoc.folderPathname.substring(
+              exportProcedureData.folderPathname.indexOf(
+                exportProcedureData.folderName
+              )
+            )
+          : exportProcedureData.folderName
+      } else {
+        return ''
+      }
+    },
+    [
+      exportProcedureData.folderName,
+      exportProcedureData.folderPathname,
       exportProcedureData.recursive,
     ]
   )
@@ -240,13 +274,7 @@ const ExportProgressItem = ({
           return exportingNoteIndex
         }
 
-        const noteExportFolder = exportProcedureData.recursive
-          ? noteDoc.folderPathname.substring(
-              exportProcedureData.folderPathname.indexOf(
-                exportProcedureData.folderName
-              )
-            )
-          : exportProcedureData.folderName
+        const noteExportFolder = getNoteFolderLocation(noteDoc)
 
         const exportNoteFilenameWithoutExtension = `${filenamify(
           getValidNoteTitle(noteDoc)
@@ -267,7 +295,6 @@ const ExportProgressItem = ({
             '.'
           )}`,
         })
-
         switch (exportProcedureData.exportType) {
           case 'html':
             await exportNoteAsHtmlFile(
@@ -327,15 +354,12 @@ const ExportProgressItem = ({
         }
         exportingNoteIndex++
       }
-
       return exportingNoteIndex
     },
     [
       getNotesForExport,
       isExportingCanceled,
-      exportProcedureData.recursive,
-      exportProcedureData.folderPathname,
-      exportProcedureData.folderName,
+      getNoteFolderLocation,
       exportProcedureData.exportType,
       setExportState,
       preferences,
@@ -373,13 +397,18 @@ const ExportProgressItem = ({
         : savePathname
       const allDocsMap: AllDocsMap = await storage.db.getAllDocsMap()
       const { noteMap, folderMap } = allDocsMap
-
-      setExportState({ exportOperation: 'Creating directories' })
+      if (exportProcedureData.exportLocation) {
+        setExportState({ exportOperation: 'Creating directories' })
+      }
       try {
         if (exportProcedureData.recursive) {
-          await createExportDirectories(folderMap, rootDir)
+          await createExportDirectories(
+            folderMap,
+            rootDir,
+            exportProcedureData.folderName ?? ''
+          )
         } else {
-          await mkdir(join(rootDir, exportProcedureData.folderName))
+          await mkdir(join(rootDir, exportProcedureData.folderName ?? '/'))
         }
       } catch (err) {
         addExportError('Cannot make directories: ' + err)

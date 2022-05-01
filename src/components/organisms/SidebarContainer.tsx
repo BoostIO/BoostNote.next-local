@@ -73,6 +73,8 @@ const SidebarContainer = ({
     openNewFolderForm,
     openRenameFolderForm,
     openRenameDocForm,
+    openRenameLabelForm,
+    removeLabelForm,
     removeWorkspace,
     exportDocuments,
   } = useLocalUI()
@@ -317,6 +319,7 @@ const SidebarContainer = ({
       push,
       toggleDocBookmark,
       toggleDocArchived,
+      removeLabelForm,
       deleteFolderApi,
       createFolderApi,
       createDocApi,
@@ -324,6 +327,7 @@ const SidebarContainer = ({
       dropInDocOrFolder,
       openRenameFolderForm,
       openRenameDocForm,
+      openRenameLabelForm,
       exportDocuments,
       copyNoteLink,
       pushMessage
@@ -333,7 +337,6 @@ const SidebarContainer = ({
     initialLoadDone,
     generalStatus.sidebarTreeSortingOrder,
     generalStatus.sidebarTreeLabelSortingOrder,
-    setGeneralStatus,
     pathname,
     sideBarOpenedLinksIdsSet,
     sideBarOpenedFolderIdsSet,
@@ -342,6 +345,7 @@ const SidebarContainer = ({
     push,
     toggleDocBookmark,
     toggleDocArchived,
+    removeLabelForm,
     deleteFolderApi,
     createFolderApi,
     createDocApi,
@@ -349,9 +353,11 @@ const SidebarContainer = ({
     dropInDocOrFolder,
     openRenameFolderForm,
     openRenameDocForm,
+    openRenameLabelForm,
     exportDocuments,
     copyNoteLink,
     pushMessage,
+    setGeneralStatus,
   ])
 
   const sidebarHeaderControls: SidebarControls = useMemo(() => {
