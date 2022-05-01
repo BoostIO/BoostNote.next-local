@@ -43,6 +43,7 @@ import {
 } from '../electronOnly'
 import { removeDuplicates } from '../../shared/lib/utils/array'
 import { welcomeNote } from '../templates/welcomeNote'
+import { TAG_ID_PREFIX } from './consts'
 
 interface StorageJSONData {
   folderMap: ObjectMap<FolderDoc>
@@ -545,7 +546,11 @@ class FSNoteDb implements NoteDb {
       })
     }
 
-    this.data!.tagMap[newTagName] = this.data?.tagMap[currentTagName]
+    const newTagNameObj = this.data!.tagMap[currentTagName]
+    if (newTagNameObj) {
+      newTagNameObj._id = TAG_ID_PREFIX + newTagName
+    }
+    this.data!.tagMap[newTagName] = newTagNameObj
     delete this.data?.tagMap[currentTagName]
 
     await this.saveBoostNoteJSON()
