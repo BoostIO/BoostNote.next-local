@@ -88,8 +88,8 @@
     "copy-webpack-plugin": "^6.2.1",
     "cross-env": "^6.0.0",
     "css-loader": "^5.2.6",
-    "electron-builder": "^22.8.1",
-    "electron-notarize": "^1.0.0",
+    "@electron/notarize": "^2.0.0",
+    "electron-builder": "^26.0.0",
     "env-cmd": "^10.0.1",
     "error-overlay-webpack-plugin": "^0.4.2",
     "eslint": "^6.4.0",
@@ -222,7 +222,9 @@
     },
     "win": {
       "verifyUpdateCodeSignature": false,
-      "certificateSubjectName": "BOOST IO K.K.",
+      "signtoolOptions": {
+        "certificateSubjectName": "BOOST IO K.K."
+      },
       "icon": "static/icon.ico",
       "target": {
         "target": "nsis",

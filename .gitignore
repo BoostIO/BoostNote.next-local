@@ -9,6 +9,7 @@ node_modules/*
 Desktop.ini
 Thumbs.db
 *.log
+*.swp
 .idea/
 compiled/*
 dist/*
