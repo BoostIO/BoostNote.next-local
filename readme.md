@@ -69,6 +69,22 @@ npm run dev:electron
 
 > For Windows users, If `npm run dev:electron` doesn't spawn an electron window, please try again after removing `%APPDATA%\electron` directory.
 
+### Creating distributable binaries
+
+To generate installable binaries for your platform (`.dmg`, `.exe`, `.AppImage`, etc.):
+
+```sh
+# 1. Compile the Electron app
+npm run build:electron
+
+# 2. Package into distributable installers
+npm run pack
+```
+
+The output will be placed in the `dist` folder.
+
+> **Note:** `npm run pack` skips the compilation step, so `build:electron` must be run first. If you also want to publish the binaries to GitHub Releases, use `npm run release` instead (it compiles and publishes in one step, but requires GitHub credentials).
+
 ## License
 
 [GPL-3.0 © 2016 - 2021 BoostIO](./LICENSE.md)
