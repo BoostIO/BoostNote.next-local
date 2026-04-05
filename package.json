@@ -36,6 +36,9 @@
   ],
   "author": "Junyoung Choi <fluke8259@gmail.com>",
   "license": "GPL-3.0",
+  "engines": {
+    "node": "16.x"
+  },
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",

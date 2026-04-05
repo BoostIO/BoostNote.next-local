@@ -41,6 +41,15 @@ Standalone app separated from Boost Note for better local space support. See [Ro
 - `electron` : Compiled electron resources from `npm run build:electron` script. You can run it by `npm start` script. The resources are for packaging the electron app.
 - `src` : Source code.
 
+### Prerequisites
+
+- Node.js 16.x — newer versions are not supported
+
+```sh
+nvm install 16
+nvm use 16
+```
+
 ### Build
 
 Please copy `.env.default` file and create a file named `.env` in the root of the project directory, or the build will fail.
@@ -49,7 +58,7 @@ Please copy `.env.default` file and create a file named `.env` in the root of th
 
 ```sh
 # Install dependencies
-npm i
+npm install
 
 # Run webpack
 npm run dev:webpack
