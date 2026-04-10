@@ -8,11 +8,14 @@ import {
   protocol,
   session,
   autoUpdater,
+  dialog,
+  shell,
 } from 'electron'
 import path from 'path'
 import url from 'url'
 import { getTemplateFromKeymap } from './menu'
 import { dev } from './consts'
+import fs from 'fs'
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null = null
@@ -40,11 +43,10 @@ function createMainWindow() {
       nodeIntegration: true,
       webSecurity: !dev,
       webviewTag: true,
-      enableRemoteModule: true,
-      contextIsolation: false,
+      contextIsolation: true,
       preload: dev
-        ? path.join(app.getAppPath(), '../static/main-preload.js')
-        : path.join(app.getAppPath(), './compiled/app/static/main-preload.js'),
+        ? path.join(app.getAppPath(), '../static/main-preload.ts')
+        : path.join(app.getAppPath(), './compiled/app/static/main-preload.ts'),
     },
     width: 1200,
     height: 800,
@@ -138,6 +140,92 @@ app.on('activate', () => {
   }
 })
 
+// bind main ipc API for electron
+//
+//
+//
+function bindElectornOnlAPI() {
+  // --- App APIs ---
+  ipcMain.handle('app:get-path', (_e, name: string) => {
+    if (name === 'app') return app.getAppPath()
+    return app.getPath(name as any)
+  })
+
+  ipcMain.handle('app:set-badge-count', (_e, count: number) => {
+    return app.setBadgeCount(count)
+  })
+
+  ipcMain.handle('app:set-default-protocol', (_e, protocol: string) => {
+    return app.setAsDefaultProtocolClient(protocol)
+  })
+
+  ipcMain.handle('app:remove-default-protocol', (_e, protocol: string) => {
+    return app.removeAsDefaultProtocolClient(protocol)
+  })
+
+  ipcMain.handle('app:is-default-protocol', (_e, protocol: string) => {
+    return app.isDefaultProtocolClient(protocol)
+  })
+
+  // ---------------- DIALOG ----------------
+
+  ipcMain.handle('dialog:open', (_e, options) => {
+    return dialog.showOpenDialog(options)
+  })
+
+  ipcMain.handle('dialog:save', (_e, options) => {
+    return dialog.showSaveDialog(options)
+  })
+
+  // ---------------- SHELL ----------------
+
+  ipcMain.handle('shell:open-external', (_e, url: string) => {
+    return shell.openExternal(url)
+  })
+
+  ipcMain.handle('shell:open-path', (_e, fullPath: string) => {
+    return shell.openPath(fullPath)
+  })
+
+  ipcMain.handle('shell:show-item', (_e, fullPath: string) => {
+    return shell.showItemInFolder(fullPath)
+  })
+
+  // ---------------- FS ----------------
+
+  ipcMain.handle('fs:read-file', (_e, path: string) =>
+    fs.promises.readFile(path)
+  )
+  ipcMain.handle('fs:write-file', (_e, path: string, data: any) =>
+    fs.promises.writeFile(path, data)
+  )
+  ipcMain.handle('fs:readdir', (_e, path: string, options?: any) =>
+    fs.promises.readdir(path, options)
+  )
+  ipcMain.handle('fs:unlink', (_e, path: string) => fs.promises.unlink(path))
+  ipcMain.handle('fs:stat', async (_e, path: string) => {
+    const stats = await fs.promises.stat(path)
+    return {
+      isDirectory: () => stats.isDirectory(),
+      isFile: () => stats.isFile(),
+      isSymbolicLink: () => stats.isSymbolicLink(),
+
+      size: stats.size,
+      mode: stats.mode,
+      mtimeMs: stats.mtimeMs,
+      atimeMs: stats.atimeMs,
+      birthtimeMs: stats.birthtimeMs,
+    }
+  })
+  ipcMain.handle('fs:mkdir', (_e, path: string) =>
+    fs.promises.mkdir(path, { recursive: true })
+  )
+}
+
+// =============================================
+// COMPAT LAYER: __ELECTRON_ONLY__ → electronAPI
+// =============================================
+
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
   /* This file protocol registration will be needed from v9.x.x for PDF export feature */
@@ -145,6 +233,7 @@ app.on('ready', () => {
     const pathname = decodeURI(request.url.replace('file:///', ''))
     callback(pathname)
   })
+  bindElectornOnlAPI()
   mainWindow = createMainWindow()
 
   ipcMain.on('menuAcceleratorChanged', (_, args) => {

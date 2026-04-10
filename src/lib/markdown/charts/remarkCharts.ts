@@ -1,6 +1,6 @@
 import visit from 'unist-util-visit'
 import { Node } from 'unist'
-import { mermaidAPI } from 'mermaid'
+import mermaidAPI from 'mermaid'
 import rehypeParse from 'rehype-parse'
 import unified from 'unified'
 import { randomBytes } from 'crypto'

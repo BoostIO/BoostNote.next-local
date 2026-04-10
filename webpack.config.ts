@@ -57,6 +57,10 @@ module.exports = (_: any, argv: Configuration) => {
       new HtmlWebpackPlugin({
         template: 'index.html',
       }),
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+        process: require.resolve('process/browser.js'),
+      }),
       new webpack.DefinePlugin({
         'process.env.VERSION': JSON.stringify(packageJson.version),
       }),
@@ -244,8 +248,9 @@ module.exports = (_: any, argv: Configuration) => {
         crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('stream-browserify'),
         fs: false,
-        buffer: require.resolve('buffer/'),
+        buffer: require.resolve('buffer'),
         vm: require.resolve('vm-browserify'),
+        process: require.resolve('process/browser'),
       },
       extensions: ['.tsx', '.ts', '.js'],
     },

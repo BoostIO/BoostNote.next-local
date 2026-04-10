@@ -109,7 +109,9 @@ async function readFileAsString(pathname: string) {
 async function prepareDirectory(pathname: string) {
   try {
     const stats = await stat(pathname)
-    if (!stats.isDirectory()) {
+
+    console.log('STats', stats)
+    if (!stats || !stats.isDirectory()) {
       throw new Error(
         `Failed to prepare a directory because ${pathname} is a file`
       )

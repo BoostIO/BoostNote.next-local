@@ -12,7 +12,8 @@ autoUpdater.autoDownload = false
 let foundUpdates = false
 
 autoUpdater.on('error', (error) => {
-  console.info(error.stack || error)
+  // todo: ignore for clean view
+  console.info('Updater failed with', error.stack || error)
 })
 
 const iconPath = path.join(app.getAppPath(), './compiled/app/static/logo.png')
@@ -108,7 +109,7 @@ export function checkForUpdates(
 
 setTimeout(() => {
   if (updater == null) {
-    autoUpdater.checkForUpdates()
+    autoUpdater.checkForUpdates().catch(console.error)
   }
 }, 10 * 1000) // After 10 secs
 
