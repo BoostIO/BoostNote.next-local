@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { NoteStorage } from '../../lib/db/types'
 import NoteDetail from '../organisms/NoteDetail'
 import {
@@ -17,11 +17,7 @@ import { usePreferences } from '../../lib/preferences'
 import { usePreviewStyle } from '../../lib/preview'
 import { mapTopBarTree } from '../../lib/v2/mappers/local/topbarTree'
 import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
-import {
-  getPathByName,
-  showSaveDialog,
-  openPath,
-} from '../../lib/electronOnly'
+import { getPathByName, showSaveDialog, openPath } from '../../lib/electronOnly'
 import { useIpcListener } from '../../lib/useIpcListener'
 import path from 'path'
 import pathParse from 'path-parse'
@@ -203,6 +199,7 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
 
   const includeFrontMatter = preferences['markdown.includeFrontMatter']
 
+  // todo: sometimes seems to open multiple windows when cancelled by user
   useIpcListener('save-as', async () => {
     if (note == null) {
       return

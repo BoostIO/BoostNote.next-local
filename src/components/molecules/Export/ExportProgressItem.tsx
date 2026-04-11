@@ -262,7 +262,8 @@ const ExportProgressItem = ({
   )
   const exportAsMd = async (noteDoc: NoteDoc, exportPath: string) => {
     const mdString = convertNoteDocToMarkdownString(noteDoc, includeFrontMatter)
-    await writeFile(exportPath, mdString)
+    const filename = `${exportPath}.md`
+    await writeFile(filename, mdString)
   }
 
   const exportAsPdf = async (
@@ -279,7 +280,8 @@ const ExportProgressItem = ({
       preferences['export.printOptions'],
       previewStyle
     )
-    await writeFile(exportPath, pdfBuffer)
+    const filename = `${exportPath}.pdf`
+    await writeFile(filename, pdfBuffer)
   }
 
   const exportAsHtml = async (
@@ -320,10 +322,11 @@ const ExportProgressItem = ({
         const exportNoteFilenameWithoutExtension = `${filenamify(
           getValidNoteTitle(noteDoc)
         )}`
-        const exportNotePathname = join(
+        const exportNotePathnameNoExt = join(
           join(rootDir, noteExportFolder),
-          `${exportNoteFilenameWithoutExtension}.${exportProcedureData.exportType}`
+          exportNoteFilenameWithoutExtension
         )
+        const exportNotePathname = `${exportNotePathnameNoExt}.${exportProcedureData.exportType}`
         setExportState({
           exportProgressValue: convertValueToPercentage(
             exportingNoteIndex / notesToExport.length
@@ -353,7 +356,7 @@ const ExportProgressItem = ({
             break
           case 'md':
             try {
-              await exportAsMd(noteDoc as NoteDoc, exportNotePathname)
+              await exportAsMd(noteDoc as NoteDoc, exportNotePathnameNoExt)
             } catch (err) {
               addExportError(
                 `Cannot export: '${exportNotePathname.substring(
@@ -364,7 +367,7 @@ const ExportProgressItem = ({
             break
           case 'all':
             try {
-              await exportAsMd(noteDoc as NoteDoc, exportNotePathname)
+              await exportAsMd(noteDoc as NoteDoc, exportNotePathnameNoExt)
             } catch (err) {
               addExportError(
                 `Cannot export: '${exportNotePathname.substring(
@@ -387,7 +390,7 @@ const ExportProgressItem = ({
             try {
               await exportAsPdf(
                 noteDoc as NoteDoc,
-                exportNotePathname,
+                exportNotePathnameNoExt,
                 attachmentMap
               )
             } catch (err) {
@@ -403,7 +406,7 @@ const ExportProgressItem = ({
             try {
               await exportAsPdf(
                 noteDoc as NoteDoc,
-                exportNotePathname,
+                exportNotePathnameNoExt,
                 attachmentMap
               )
             } catch (err) {
