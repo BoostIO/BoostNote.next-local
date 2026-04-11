@@ -16,6 +16,7 @@ import url from 'url'
 import { getTemplateFromKeymap } from './menu'
 import { dev } from './consts'
 import fs from 'fs'
+import { lookup } from 'mime-types'
 
 function waitForLoad(webContents: Electron.WebContents) {
   return new Promise<void>((resolve, reject) => {
@@ -239,6 +240,9 @@ function bindElectornOnlAPI() {
   ipcMain.handle('fs:read-file', (_e, path: string) =>
     fs.promises.readFile(path, 'utf8')
   )
+  ipcMain.handle('fs:read-file-type', (_e, path: string) => {
+    return lookup(path) || null
+  })
   ipcMain.handle('fs:read-file-buffer', (_e, path: string) =>
     fs.promises.readFile(path)
   )
@@ -248,7 +252,7 @@ function bindElectornOnlAPI() {
   ipcMain.handle('fs:readdir', async (_e, path: string, options?: any) => {
     const result = await fs.promises.readdir(path, options)
 
-    if (!options?.withFileTypes) {
+    if (options === undefined || options.withFileTypes === false) {
       return result
     }
 

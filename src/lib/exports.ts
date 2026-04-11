@@ -153,7 +153,7 @@ async function exportNoteAssets(
 }
 
 async function writeKatexFonts(assetsFolder: string) {
-  const cssLinkRoot = getCssLinkCommonPath(false)
+  const cssLinkRoot = await getCssLinkCommonPath(false)
   const katexFontsPath = dev
     ? `${cssLinkRoot}/katex/dist/fonts`
     : `${cssLinkRoot}/katex/fonts/`
@@ -434,7 +434,9 @@ async function updateAttachmentLinksToObjectUrls(
 
     let srcUrl = ''
     if (imageData.src) {
-      const fileBuffer = await readFileBuffer(excludeFileProtocol(imageData.src))
+      const fileBuffer = await readFileBuffer(
+        excludeFileProtocol(imageData.src)
+      )
       srcUrl = `data:image/png;base64,${Buffer.from(fileBuffer).toString(
         'base64'
       )}`

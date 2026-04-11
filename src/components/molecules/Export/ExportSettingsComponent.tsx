@@ -9,6 +9,10 @@ import styled from '../../../shared/lib/styled'
 import { FormRowProps } from '../../../shared/components/molecules/Form/templates/FormRow'
 import { openDialog } from '../../../lib/exports'
 import { useTranslation } from 'react-i18next'
+
+const exportFormatOptions = ['all', 'md', 'html', 'pdf']
+const exportFormatLabels = ['All formats', 'Markdown', 'HTML', 'PDF']
+
 interface ExportSettingsComponentProps {
   exportSettings: LocalExportResourceRequestBody
   onStartExport: (exportSettings: ExportProcedureData) => void
@@ -19,7 +23,9 @@ const ExportSettingsComponent = ({
   onStartExport,
 }: ExportSettingsComponentProps) => {
   const [exportLocation, setExportLocation] = useState<string>('')
-  const [exportFormat, setExportFormat] = useState<string>('pdf')
+  const [exportFormat, setExportFormat] = useState<
+    typeof exportFormatOptions[number]
+  >('all')
   const [recursive, setRecursive] = useState<boolean>(
     exportSettings.exportingStorage
   )
@@ -47,8 +53,8 @@ const ExportSettingsComponent = ({
                   <SimpleFormSelect
                     value={exportFormat}
                     onChange={setExportFormat}
-                    options={['md', 'html', 'pdf']}
-                    labels={['Markdown', 'HTML', 'PDF']}
+                    options={exportFormatOptions}
+                    labels={exportFormatLabels}
                   />
                 ),
               },

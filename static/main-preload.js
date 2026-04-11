@@ -12,22 +12,26 @@
     app: {
       getPath: (name) => ipcRenderer.invoke('app:get-path', name),
       setBadgeCount: (n) => ipcRenderer.invoke('app:set-badge-count', n),
-      setDefaultProtocol: (p) => ipcRenderer.invoke('app:set-default-protocol', p),
+      setDefaultProtocol: (p) =>
+        ipcRenderer.invoke('app:set-default-protocol', p),
       removeDefaultProtocol: (p) =>
         ipcRenderer.invoke('app:remove-default-protocol', p),
-      isDefaultProtocol: (p) => ipcRenderer.invoke('app:is-default-protocol', p),
+      isDefaultProtocol: (p) =>
+        ipcRenderer.invoke('app:is-default-protocol', p),
     },
 
     shell: {
       openExternal: (url) => ipcRenderer.invoke('shell:open-external', url),
       openPath: (targetPath, folderOnly = false) =>
         ipcRenderer.invoke('shell:open-path', targetPath, folderOnly),
-      showItem: (targetPath) => ipcRenderer.invoke('shell:show-item', targetPath),
+      showItem: (targetPath) =>
+        ipcRenderer.invoke('shell:show-item', targetPath),
       getPathForFile: (file) => webUtils.getPathForFile(file),
     },
 
     fs: {
       readFile: (p) => ipcRenderer.invoke('fs:read-file', p),
+      readFileType: (p) => ipcRenderer.invoke('fs:read-file-type', p),
       readFileBuffer: (p) => ipcRenderer.invoke('fs:read-file-buffer', p),
       writeFile: (p, d) => ipcRenderer.invoke('fs:write-file', p, d),
       readdir: (p, o) => ipcRenderer.invoke('fs:readdir', p, o),
@@ -93,7 +97,8 @@
       stringifyCSON: api.utils && api.utils.stringifyCSON,
 
       openNewWindow: api.window.create,
-      openContextMenu: (options) => api.window.openContextMenu && api.window.openContextMenu(options),
+      openContextMenu: (options) =>
+        api.window.openContextMenu && api.window.openContextMenu(options),
       setTrafficLightPosition: api.window.setButtonPosition,
       getPathByName: api.app.getPath,
 
