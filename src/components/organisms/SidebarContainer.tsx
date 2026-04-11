@@ -5,9 +5,8 @@ import { usePreferences } from '../../lib/preferences'
 import { NoteStorage } from '../../lib/db/types'
 import {
   openContextMenu,
-  addIpcListener,
-  removeIpcListener,
 } from '../../lib/electronOnly'
+import { useIpcListener } from '../../lib/useIpcListener'
 import { getTimelineHref, values } from '../../lib/db/utils'
 import { MenuItemConstructorOptions } from 'electron'
 import { useStorageRouter } from '../../lib/storageRouter'
@@ -239,37 +238,19 @@ const SidebarContainer = ({
     }
   }, [push, hash])
 
-  useEffect(() => {
-    const handler = async () => {
-      await createNoteByRoute()
-    }
-    addIpcListener('new-note', handler)
-    return () => {
-      removeIpcListener('new-note', handler)
-    }
-  }, [createNoteByRoute])
+  useIpcListener('new-note', async () => {
+    await createNoteByRoute()
+  })
 
-  useEffect(() => {
-    const handler = async () => {
-      await createFolderByRoute()
-    }
-    addIpcListener('new-folder', handler)
-    return () => {
-      removeIpcListener('new-folder', handler)
-    }
-  }, [createFolderByRoute, createNoteByRoute])
+  useIpcListener('new-folder', async () => {
+    await createFolderByRoute()
+  })
 
   const { toggleShowSearchModal } = useSearchModal()
 
-  useEffect(() => {
-    const handler = () => {
-      toggleShowSearchModal()
-    }
-    addIpcListener('search', handler)
-    return () => {
-      removeIpcListener('search', handler)
-    }
-  }, [toggleShowSearchModal])
+  useIpcListener('search', () => {
+    toggleShowSearchModal()
+  })
 
   const sidebarResize = useCallback(
     (width: number) => setGeneralStatus({ sideBarWidth: width }),

@@ -18,12 +18,11 @@ import { usePreviewStyle } from '../../lib/preview'
 import { mapTopBarTree } from '../../lib/v2/mappers/local/topbarTree'
 import { useLocalUI } from '../../lib/v2/hooks/useLocalUI'
 import {
-  addIpcListener,
   getPathByName,
-  removeIpcListener,
   showSaveDialog,
   openPath,
 } from '../../lib/electronOnly'
+import { useIpcListener } from '../../lib/useIpcListener'
 import path from 'path'
 import pathParse from 'path-parse'
 import {
@@ -188,12 +187,7 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
     openRenameDocForm(storage.id, note)
   }, [note, openRenameDocForm, storage])
 
-  useEffect(() => {
-    addIpcListener('toggle-preview-mode', togglePreviewMode)
-    return () => {
-      removeIpcListener('toggle-preview-mode', togglePreviewMode)
-    }
-  }, [togglePreviewMode])
+  useIpcListener('toggle-preview-mode', togglePreviewMode)
 
   const toggleSplitEditMode = useCallback(() => {
     if (noteViewMode === 'edit') {
@@ -203,124 +197,101 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
     }
   }, [noteViewMode, selectSplitMode, selectEditMode])
 
-  useEffect(() => {
-    addIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
-    return () => {
-      removeIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
-    }
-  }, [toggleSplitEditMode])
+  useIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
 
-  useEffect(() => {
-    addIpcListener('focus-title', focusTitle)
-    return () => {
-      removeIpcListener('focus-title', focusTitle)
-    }
-  }, [focusTitle])
+  useIpcListener('focus-title', focusTitle)
 
   const includeFrontMatter = preferences['markdown.includeFrontMatter']
 
-  useEffect(() => {
-    const handler = async () => {
-      if (note == null) {
+  useIpcListener('save-as', async () => {
+    if (note == null) {
+      return
+    }
+    const defaultPath = path.join(
+      await getPathByName('home'),
+      filenamify(note.title) + '.md'
+    )
+    showSaveDialog({
+      properties: ['createDirectory', 'showOverwriteConfirmation'],
+      buttonLabel: 'Save',
+      defaultPath,
+      filters: [
+        {
+          name: 'Markdown',
+          extensions: ['md'],
+        },
+        {
+          name: 'HTML',
+          extensions: ['html'],
+        },
+        {
+          name: 'PDF',
+          extensions: ['pdf'],
+        },
+      ],
+    }).then(async (result) => {
+      if (result.canceled || result.filePath == null) {
         return
       }
-      const defaultPath = path.join(
-        await getPathByName('home'),
-        filenamify(note.title) + '.md'
-      )
-      showSaveDialog({
-        properties: ['createDirectory', 'showOverwriteConfirmation'],
-        buttonLabel: 'Save',
-        defaultPath,
-        filters: [
-          {
-            name: 'Markdown',
-            extensions: ['md'],
-          },
-          {
-            name: 'HTML',
-            extensions: ['html'],
-          },
-          {
-            name: 'PDF',
-            extensions: ['pdf'],
-          },
-        ],
-      }).then(async (result) => {
-        if (result.canceled || result.filePath == null) {
+      const parsedFilePath = pathParse(result.filePath)
+      switch (parsedFilePath.ext) {
+        case '.html':
+          await exportNoteAsHtmlFile(
+            parsedFilePath.dir,
+            parsedFilePath.name,
+            note,
+            preferences['markdown.codeBlockTheme'],
+            preferences['general.theme'],
+            pushMessage,
+            storage.attachmentMap,
+            previewStyle
+          )
+          pushMessage({
+            onClick: () => {
+              if (result.filePath) {
+                openPath(result.filePath)
+              }
+            },
+            type: 'success',
+            title: 'HTML export',
+            description: 'HTML file exported successfully.',
+          })
           return
-        }
-        const parsedFilePath = pathParse(result.filePath)
-        switch (parsedFilePath.ext) {
-          case '.html':
-            await exportNoteAsHtmlFile(
-              parsedFilePath.dir,
-              parsedFilePath.name,
-              note,
-              preferences['markdown.codeBlockTheme'],
-              preferences['general.theme'],
-              pushMessage,
-              storage.attachmentMap,
-              previewStyle
-            )
-            pushMessage({
-              onClick: () => {
-                if (result.filePath) {
-                  openPath(result.filePath)
-                }
-              },
-              type: 'success',
-              title: 'HTML export',
-              description: 'HTML file exported successfully.',
-            })
-            return
-          case '.pdf':
-            await exportNoteAsPdfFile(
-              result.filePath,
-              note,
-              preferences['markdown.codeBlockTheme'],
-              preferences['general.theme'],
-              pushMessage,
-              storage.attachmentMap,
-              preferences['export.printOptions'],
-              previewStyle
-            )
-            return
-          case '.md':
-          default:
-            await exportNoteAsMarkdownFile(
-              parsedFilePath.dir,
-              parsedFilePath.name,
-              note,
-              storage.attachmentMap,
-              includeFrontMatter
-            )
-            pushMessage({
-              onClick: () => {
-                if (result.filePath) {
-                  openPath(result.filePath)
-                }
-              },
-              type: 'success',
-              title: 'Markdown export',
-              description: 'Markdown file exported successfully.',
-            })
-            return
-        }
-      })
-    }
-    addIpcListener('save-as', handler)
-    return () => {
-      removeIpcListener('save-as', handler)
-    }
-  }, [
-    note,
-    includeFrontMatter,
-    preferences,
-    previewStyle,
-    pushMessage,
-    storage.attachmentMap,
-  ])
+        case '.pdf':
+          await exportNoteAsPdfFile(
+            result.filePath,
+            note,
+            preferences['markdown.codeBlockTheme'],
+            preferences['general.theme'],
+            pushMessage,
+            storage.attachmentMap,
+            preferences['export.printOptions'],
+            previewStyle
+          )
+          return
+        case '.md':
+        default:
+          await exportNoteAsMarkdownFile(
+            parsedFilePath.dir,
+            parsedFilePath.name,
+            note,
+            storage.attachmentMap,
+            includeFrontMatter
+          )
+          pushMessage({
+            onClick: () => {
+              if (result.filePath) {
+                openPath(result.filePath)
+              }
+            },
+            type: 'success',
+            title: 'Markdown export',
+            description: 'Markdown file exported successfully.',
+          })
+          return
+      }
+    })
+  })
 
   const toggleBookmark = useCallback(async () => {
     if (note == null) {
@@ -333,12 +304,7 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
     }
   }, [note, unBookmark, bookmark])
 
-  useEffect(() => {
-    addIpcListener('toggle-bookmark', toggleBookmark)
-    return () => {
-      removeIpcListener('toggle-bookmark', toggleBookmark)
-    }
-  })
+  useIpcListener('toggle-bookmark', toggleBookmark)
 
   const toggleContextView = useCallback(() => {
     setGeneralStatus((previousGeneralStatus) => {
