@@ -54,7 +54,7 @@ function createMainWindow() {
       webviewTag: true,
       contextIsolation: true,
       preload: dev
-        ? path.join(app.getAppPath(), '../static/main-preload.ts')
+        ? path.join(app.getAppPath(), '../static/main-preload.js')
         : path.join(app.getAppPath(), './compiled/app/static/main-preload.js'),
     },
     width: 1200,
@@ -245,9 +245,20 @@ function bindElectornOnlAPI() {
   ipcMain.handle('fs:write-file', (_e, path: string, data: any) =>
     fs.promises.writeFile(path, data)
   )
-  ipcMain.handle('fs:readdir', (_e, path: string, options?: any) =>
-    fs.promises.readdir(path, options)
-  )
+  ipcMain.handle('fs:readdir', async (_e, path: string, options?: any) => {
+    const result = await fs.promises.readdir(path, options)
+
+    if (!options?.withFileTypes) {
+      return result
+    }
+
+    return result.map((dirent) => ({
+      name: dirent.name,
+      isDirectory: dirent.isDirectory(),
+      isFile: dirent.isFile(),
+      isSymbolicLink: dirent.isSymbolicLink(),
+    }))
+  })
   ipcMain.handle('fs:unlink', (_e, path: string) => fs.promises.unlink(path))
   ipcMain.handle('fs:stat', async (_e, path: string) => {
     const stats = await fs.promises.stat(path)

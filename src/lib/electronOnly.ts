@@ -1,4 +1,4 @@
-import { Stats, Dirent } from 'fs'
+import { Stats } from 'fs'
 import { JsonValue } from 'type-fest'
 import {
   BrowserWindowConstructorOptions,
@@ -11,6 +11,13 @@ import {
 import { CookiesSetDetails, CookiesGetFilter, Cookie } from 'electron/main'
 import { Got } from 'got'
 
+interface SerializedDirent {
+  name: string
+  isDirectory: boolean
+  isFile: boolean
+  isSymbolicLink: boolean
+}
+
 const __ELECTRON_ONLY__: {
   readFile(pathname: string): Promise<string>
   readFileBuffer(pathname: string): Promise<Uint8Array>
@@ -18,7 +25,10 @@ const __ELECTRON_ONLY__: {
     pathname: string,
     options?: { withFileTypes?: false }
   ): Promise<string[]>
-  readdir(pathname: string, options: { withFileTypes: true }): Promise<Dirent[]>
+  readdir(
+    pathname: string,
+    options: { withFileTypes: true }
+  ): Promise<SerializedDirent[]>
   writeFile(pathname: string, data: string | Buffer): Promise<void>
   unlinkFile(pathname: string): Promise<void>
   stat(pathname: string): Promise<Stats>

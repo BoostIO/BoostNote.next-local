@@ -141,7 +141,7 @@
     "electron-updater": "6.3.0-alpha.6",
     "emoji-mart": "^3.0.0",
     "file-loader": "^5.0.2",
-    "file-type": "^14.6.2",
+    "file-type": "21.3.2",
     "filenamify": "^4.1.0",
     "flowchart.js": "^1.15.0",
     "fuse.js": "^6.4.6",
