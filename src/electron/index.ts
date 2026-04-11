@@ -46,7 +46,7 @@ function createMainWindow() {
       contextIsolation: true,
       preload: dev
         ? path.join(app.getAppPath(), '../static/main-preload.ts')
-        : path.join(app.getAppPath(), './compiled/app/static/main-preload.ts'),
+        : path.join(app.getAppPath(), './compiled/app/static/main-preload.js'),
     },
     width: 1200,
     height: 800,
@@ -195,6 +195,9 @@ function bindElectornOnlAPI() {
 
   ipcMain.handle('fs:read-file', (_e, path: string) =>
     fs.promises.readFile(path, 'utf8')
+  )
+  ipcMain.handle('fs:read-file-buffer', (_e, path: string) =>
+    fs.promises.readFile(path)
   )
   ipcMain.handle('fs:write-file', (_e, path: string, data: any) =>
     fs.promises.writeFile(path, data)

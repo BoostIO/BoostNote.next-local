@@ -21,6 +21,7 @@ import {
   getPathByName,
   mkdir,
   readFile,
+  readFileBuffer,
   showOpenDialog,
   writeFile,
   readdir,
@@ -127,10 +128,12 @@ async function exportNoteAssets(
         continue
       }
       if (data.type === 'src') {
-        const attachmentData = await readFile(excludeFileProtocol(data.src))
+        const attachmentData = await readFileBuffer(
+          excludeFileProtocol(data.src)
+        )
         await writeFile(
           join(attachmentsFolderPathname, attachmentFileName),
-          attachmentData
+          Buffer.from(attachmentData)
         )
       } else {
         await writeFile(
@@ -159,8 +162,13 @@ async function writeKatexFonts(assetsFolder: string) {
     if (fontsFilenames.length > 0) {
       await mkdir(`${assetsFolder}/fonts/`)
       for (const fontFilename of fontsFilenames) {
-        const fontContents = await readFile(`${katexFontsPath}/${fontFilename}`)
-        await writeFile(`${assetsFolder}/fonts/${fontFilename}`, fontContents)
+        const fontContents = await readFileBuffer(
+          `${katexFontsPath}/${fontFilename}`
+        )
+        await writeFile(
+          `${assetsFolder}/fonts/${fontFilename}`,
+          Buffer.from(fontContents)
+        )
       }
     }
   } catch (error) {

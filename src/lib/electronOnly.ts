@@ -12,7 +12,8 @@ import { CookiesSetDetails, CookiesGetFilter, Cookie } from 'electron/main'
 import { Got } from 'got'
 
 const __ELECTRON_ONLY__: {
-  readFile(pathname: string): Promise<string | Buffer>
+  readFile(pathname: string): Promise<string>
+  readFileBuffer(pathname: string): Promise<Uint8Array>
   readdir(
     pathname: string,
     options?: { withFileTypes?: false }
@@ -34,6 +35,7 @@ const __ELECTRON_ONLY__: {
   ): Promise<Electron.SaveDialogReturnValue>
   openExternal(url: string): void
   openPath(fullPath: string, folderOnly?: boolean): void
+  getPathForFile(file: File): string
   parseCSON(value: string): JsonValue
   stringifyCSON(value: any): string
   openNewWindow(options: BrowserWindowConstructorOptions): BrowserWindow
@@ -67,6 +69,7 @@ const __ELECTRON_ONLY__: {
 
 const {
   readFile,
+  readFileBuffer,
   readdir,
   writeFile,
   unlinkFile,
@@ -78,6 +81,7 @@ const {
   showSaveDialog,
   openExternal,
   openPath,
+  getPathForFile,
   parseCSON,
   stringifyCSON,
   openNewWindow,
@@ -123,6 +127,7 @@ async function prepareDirectory(pathname: string) {
 
 export {
   readFile,
+  readFileBuffer,
   readFileAsString,
   readdir,
   writeFile,
@@ -136,6 +141,7 @@ export {
   showSaveDialog,
   openExternal,
   openPath,
+  getPathForFile,
   parseCSON,
   stringifyCSON,
   openNewWindow,

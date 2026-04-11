@@ -5,6 +5,7 @@
   const electron = require('electron')
   const ipcRenderer = electron.ipcRenderer
   const contextBridge = electron.contextBridge
+  const webUtils = electron.webUtils
 
   const electronAPI = {
     // ---------------- APP ----------------
@@ -26,11 +27,13 @@
         ipcRenderer.invoke('shell:open-external', url),
       openPath: (path: string) => ipcRenderer.invoke('shell:open-path', path),
       showItem: (path: string) => ipcRenderer.invoke('shell:show-item', path),
+      getPathForFile: (file: File) => webUtils.getPathForFile(file),
     },
 
     // ---------------- FS ----------------
     fs: {
       readFile: (p: string) => ipcRenderer.invoke('fs:read-file', p),
+      readFileBuffer: (p: string) => ipcRenderer.invoke('fs:read-file-buffer', p),
       writeFile: (p: string, d: any) =>
         ipcRenderer.invoke('fs:write-file', p, d),
       readdir: (p: string, o?: any) => ipcRenderer.invoke('fs:readdir', p, o),
@@ -75,6 +78,7 @@
     return {
       // ---------------- FS ----------------
       readFile: api.fs.readFile,
+      readFileBuffer: api.fs.readFileBuffer,
       readdir: api.fs.readdir,
       writeFile: api.fs.writeFile,
       unlinkFile: api.fs.unlink,
@@ -92,6 +96,7 @@
       // ---------------- SHELL ----------------
       openExternal: api.shell.openExternal,
       openPath: api.shell.openPath,
+      getPathForFile: api.shell.getPathForFile,
 
       // ---------------- CSON ----------------
       parseCSON: api.utils?.parseCSON,

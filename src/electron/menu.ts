@@ -1,5 +1,6 @@
 import {
   app,
+  BaseWindow,
   BrowserWindow,
   MenuItem,
   MenuItemConstructorOptions,
@@ -11,14 +12,14 @@ import { createEmitIpcMenuItemHandler } from './ipc'
 const mac = process.platform === 'darwin'
 
 function createSwitchWorkspaceHandler(index: number) {
-  return (_menu: MenuItem, browserWindow?: BrowserWindow) => {
-    if (browserWindow == null) {
+  return (_menu: MenuItem, window?: BaseWindow) => {
+    if (!(window instanceof BrowserWindow)) {
       console.warn(
         `Failed to emit \`switch-workspace\` ipc event because the browser window for menu item is missing`
       )
       return
     }
-    browserWindow.webContents.send('switch-workspace', index)
+    window.webContents.send('switch-workspace', index)
   }
 }
 

@@ -10,7 +10,7 @@ import {
 } from '../atoms/form'
 import {
   stat,
-  readFile,
+  readFileBuffer,
   readFileAsString,
   readdir,
   parseCSON,
@@ -136,7 +136,7 @@ const ImportLegacyNotesForm = ({ storageId }: ImportLegacyNotesFormProps) => {
                     fileName
                   )
                   try {
-                    const result = await readFile(attachmentPathname)
+                    const result = await readFileBuffer(attachmentPathname)
 
                     const file = await convertBufferToFile(result, fileName)
 
@@ -390,7 +390,7 @@ async function readdirOrEmpty(pathname: string) {
 }
 
 async function convertBufferToFile(
-  value: Buffer | string,
+  value: Buffer | Uint8Array | string,
   fileName: string
 ): Promise<File> {
   if (!Buffer.isBuffer(value)) {

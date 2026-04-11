@@ -16,7 +16,13 @@ const ExportTab = () => {
       setPreferences({
         'export.printOptions': {
           ...preferences['export.printOptions'],
-          marginsType: parseNumberStringOrReturnZero(marginsType),
+          // todo: check this calculations...
+          margins: {
+            top: parseNumberStringOrReturnZero(marginsType),
+            bottom: parseNumberStringOrReturnZero(marginsType),
+            left: parseNumberStringOrReturnZero(marginsType),
+            right: parseNumberStringOrReturnZero(marginsType),
+          },
         },
       })
     },
@@ -84,7 +90,10 @@ const ExportTab = () => {
                 type: 'node',
                 element: (
                   <SimpleFormSelect
-                    value={preferences['export.printOptions'].marginsType + ''}
+                    value={
+                      preferences['export.printOptions'].margins!.marginType +
+                      ''
+                    }
                     onChange={selectMargins}
                     options={[
                       MarginType.NoMargins + '',
