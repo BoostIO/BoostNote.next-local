@@ -101,17 +101,13 @@ const {
 } = __ELECTRON_ONLY__ || {}
 
 async function readFileAsString(pathname: string) {
-  const result = await readFile(pathname)
-
-  return result.toString()
+  return readFile(pathname)
 }
 
 async function prepareDirectory(pathname: string) {
   try {
     const stats = await stat(pathname)
-
-    console.log('STats', stats)
-    if (!stats || !stats.isDirectory()) {
+    if (!stats.isDirectory) {
       throw new Error(
         `Failed to prepare a directory because ${pathname} is a file`
       )

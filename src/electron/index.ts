@@ -194,7 +194,7 @@ function bindElectornOnlAPI() {
   // ---------------- FS ----------------
 
   ipcMain.handle('fs:read-file', (_e, path: string) =>
-    fs.promises.readFile(path)
+    fs.promises.readFile(path, 'utf8')
   )
   ipcMain.handle('fs:write-file', (_e, path: string, data: any) =>
     fs.promises.writeFile(path, data)
@@ -206,9 +206,9 @@ function bindElectornOnlAPI() {
   ipcMain.handle('fs:stat', async (_e, path: string) => {
     const stats = await fs.promises.stat(path)
     return {
-      isDirectory: () => stats.isDirectory(),
-      isFile: () => stats.isFile(),
-      isSymbolicLink: () => stats.isSymbolicLink(),
+      isDirectory: stats.isDirectory(),
+      isFile: stats.isFile(),
+      isSymbolicLink: stats.isSymbolicLink(),
 
       size: stats.size,
       mode: stats.mode,

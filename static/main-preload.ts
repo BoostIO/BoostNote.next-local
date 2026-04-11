@@ -1,17 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-// import { parse } from 'url'
 ;(function () {
   if (typeof require === 'undefined') {
     return
   }
   const electron = require('electron')
-  // window.electron = electron
-  // const fs = require('fs')
-  // const FileType = require('file-type')
-  // const readChunk = require('read-chunk')
-  // const CSON = require('cson-parser')
-  // const got = require('got')
-  // const isSvg = require('is-svg')
   const ipcRenderer = electron.ipcRenderer
   const contextBridge = electron.contextBridge
 
@@ -73,6 +64,9 @@
     ipc: {
       send: (ch: string, d: any) => ipcRenderer.send(ch, d),
       on: (ch: string, fn: (...args: any[]) => void) => ipcRenderer.on(ch, fn),
+      off: (ch: string, fn: (...args: any[]) => void) =>
+        ipcRenderer.off(ch, fn),
+      removeAll: () => ipcRenderer.removeAllListeners(),
     },
   }
   contextBridge.exposeInMainWorld('electronAPI', electronAPI)
@@ -149,38 +143,4 @@
     '__ELECTRON_ONLY__',
     createElectronOnlyAdapter(electronAPI)
   )
-  //   window.__ELECTRON_ONLY__ = {}
-  //   window.__ELECTRON_ONLY__.openExternal = openExternal
-  //   window.__ELECTRON_ONLY__.openPath = openPath
-  //   window.__ELECTRON_ONLY__.readFile = readFile
-  //   window.__ELECTRON_ONLY__.showOpenDialog = showOpenDialog
-  //   window.__ELECTRON_ONLY__.showSaveDialog = showSaveDialog
-  //   window.__ELECTRON_ONLY__.getHomePath = getHomePath
-  //   window.__ELECTRON_ONLY__.writeFile = writeFile
-  //   window.__ELECTRON_ONLY__.unlinkFile = unlinkFile
-  //   window.__ELECTRON_ONLY__.readdir = readdir
-  //   window.__ELECTRON_ONLY__.stat = stat
-  //   window.__ELECTRON_ONLY__.mkdir = mkdir
-  //   window.__ELECTRON_ONLY__.readFileType = readFileType
-  //   window.__ELECTRON_ONLY__.readFileTypeFromBuffer = readFileTypeFromBuffer
-  //   window.__ELECTRON_ONLY__.parseCSON = parseCSON
-  //   window.__ELECTRON_ONLY__.stringifyCSON = stringifyCSON
-  //   window.__ELECTRON_ONLY__.openNewWindow = openNewWindow
-  //   window.__ELECTRON_ONLY__.openContextMenu = openContextMenu
-  //   window.__ELECTRON_ONLY__.getPathByName = getPathByName
-  //   window.__ELECTRON_ONLY__.addIpcListener = addIpcListener
-  //   window.__ELECTRON_ONLY__.sendIpcMessage = sendIpcMessage
-  //   window.__ELECTRON_ONLY__.removeIpcListener = removeIpcListener
-  //   window.__ELECTRON_ONLY__.removeAllIpcListeners = removeAllIpcListeners
-  //   window.__ELECTRON_ONLY__.setAsDefaultProtocolClient = setAsDefaultProtocolClient
-  //   window.__ELECTRON_ONLY__.removeAsDefaultProtocolClient = removeAsDefaultProtocolClient
-  //   window.__ELECTRON_ONLY__.isDefaultProtocolClient = isDefaultProtocolClient
-  //   window.__ELECTRON_ONLY__.getWebContentsById = getWebContentsById
-  //   window.__ELECTRON_ONLY__.setTrafficLightPosition = setTrafficLightPosition
-  //   window.__ELECTRON_ONLY__.convertHtmlStringToPdfBuffer = convertHtmlStringToPdfBuffer
-  //   window.__ELECTRON_ONLY__.setCookie = setCookie
-  //   window.__ELECTRON_ONLY__.getCookie = getCookie
-  //   window.__ELECTRON_ONLY__.removeCookie = removeCookie
-  //   window.__ELECTRON_ONLY__.setBadgeCount = setBadgeCount
-  //   window.__ELECTRON_ONLY__.got = got
 })()
