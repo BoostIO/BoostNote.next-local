@@ -158,7 +158,7 @@
     "lodash": "4.18.1",
     "lodash.debounce": "^4.0.8",
     "ltstrg": "^1.0.1",
-    "mermaid": "^8.9.0",
+    "mermaid": "11.10.0",
     "nprogress": "^0.2.0",
     "overlayscrollbars-react": "^0.2.3",
     "ow": "^0.13.2",

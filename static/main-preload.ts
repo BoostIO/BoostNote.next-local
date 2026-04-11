@@ -54,6 +54,12 @@
       create: (opts: any) => ipcRenderer.invoke('window:create', opts),
       setButtonPosition: (pos: any) =>
         ipcRenderer.invoke('window:set-button-position', pos),
+      convertHtmlToPdf: (htmlString: string, printOptions: any) =>
+        ipcRenderer.invoke(
+          'window:convert-html-to-pdf',
+          htmlString,
+          printOptions
+        ),
     },
 
     // ---------------- COOKIES ----------------

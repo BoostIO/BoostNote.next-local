@@ -65,7 +65,7 @@ const ImportLegacyNotesForm = ({ storageId }: ImportLegacyNotesFormProps) => {
         throw new Error('Destination folder pathname is not valid.')
       }
       const folderStat = await stat(location)
-      if (!folderStat.isDirectory()) {
+      if (!folderStat.isDirectory) {
         throw new Error(`\`${location}\` is not a folder.`)
       }
       const boostnoteJsonPathname = join(location, 'boostnote.json')

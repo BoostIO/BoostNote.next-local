@@ -247,7 +247,7 @@ class FSNoteDb implements NoteDb {
       withFileTypes: true,
     })
     const fileNames = fileDirents.reduce<string[]>((fileNames, dirent) => {
-      if (!dirent.isDirectory()) {
+      if (!dirent.isDirectory) {
         fileNames.push(dirent.name)
       }
       return fileNames

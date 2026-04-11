@@ -17,6 +17,15 @@ import { getTemplateFromKeymap } from './menu'
 import { dev } from './consts'
 import fs from 'fs'
 
+function waitForLoad(webContents: Electron.WebContents) {
+  return new Promise<void>((resolve, reject) => {
+    webContents.once('did-finish-load', () => resolve())
+    webContents.once('did-fail-load', (_event, _code, description) => {
+      reject(new Error(description))
+    })
+  })
+}
+
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null = null
 const MAC = process.platform === 'darwin'
@@ -169,24 +178,29 @@ function bindElectornOnlAPI() {
 
   // ---------------- DIALOG ----------------
 
-  ipcMain.handle('dialog:open', async (_e, options: Electron.OpenDialogOptions) => {
-    const result = await dialog.showOpenDialog(options)
-    return {
-      canceled: result.canceled,
-      filePaths: [...result.filePaths],
-      bookmarks:
-        result.bookmarks == null ? undefined : [...result.bookmarks],
+  ipcMain.handle(
+    'dialog:open',
+    async (_e, options: Electron.OpenDialogOptions) => {
+      const result = await dialog.showOpenDialog(options)
+      return {
+        canceled: result.canceled,
+        filePaths: [...result.filePaths],
+        bookmarks: result.bookmarks == null ? undefined : [...result.bookmarks],
+      }
     }
-  })
+  )
 
-  ipcMain.handle('dialog:save', async (_e, options: Electron.SaveDialogOptions) => {
-    const result = await dialog.showSaveDialog(options)
-    return {
-      canceled: result.canceled,
-      filePath: result.filePath,
-      bookmark: result.bookmark,
+  ipcMain.handle(
+    'dialog:save',
+    async (_e, options: Electron.SaveDialogOptions) => {
+      const result = await dialog.showSaveDialog(options)
+      return {
+        canceled: result.canceled,
+        filePath: result.filePath,
+        bookmark: result.bookmark,
+      }
     }
-  })
+  )
 
   // ---------------- SHELL ----------------
 
@@ -209,8 +223,7 @@ function bindElectornOnlAPI() {
 
         return await shell.openPath(fullPath)
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : String(error)
+        const message = error instanceof Error ? error.message : String(error)
         console.error(`Failed to open path: ${fullPath}`, error)
         return message
       }
@@ -252,6 +265,73 @@ function bindElectornOnlAPI() {
   })
   ipcMain.handle('fs:mkdir', (_e, path: string) =>
     fs.promises.mkdir(path, { recursive: true })
+  )
+
+  // ---------------- WINDOW ----------------
+  // todo: was:
+  // return new Promise((resolve, reject) => {
+  //   const encodedStr = encodeURIComponent(htmlString)
+  //   const { BrowserWindow } = electron.remote
+  //   const windowOptions = {
+  //     webPreferences: {
+  //       nodeIntegration: false,
+  //       webSecurity: false,
+  //       javascript: false,
+  //     },
+  //     show: false,
+  //   }
+  //   const browserWindow = new BrowserWindow(windowOptions)
+  //   browserWindow.loadURL('data:text/html;charset=UTF-8,' + encodedStr)
+  //
+  //   browserWindow.webContents.on('did-finish-load', async () => {
+  //     try {
+  //       const pdfFileBuffer = await browserWindow.webContents.printToPDF(
+  //         printOptions
+  //       )
+  //       resolve(pdfFileBuffer)
+  //     } catch (error) {
+  //       reject(error)
+  //     } finally {
+  //       browserWindow.destroy()
+  //     }
+  //   })
+  // })
+  ipcMain.handle(
+    'window:convert-html-to-pdf',
+    async (
+      _e,
+      htmlString: string,
+      printOptions: Electron.PrintToPDFOptions
+    ) => {
+      const pdfWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+          sandbox: false,
+          webSecurity: false,
+        },
+      })
+
+      try {
+        const htmlDataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(
+          htmlString
+        )}`
+
+        const loadPromise = waitForLoad(pdfWindow.webContents)
+        await pdfWindow.loadURL(htmlDataUrl)
+        await loadPromise
+
+        await pdfWindow.webContents.executeJavaScript(
+          `document.fonts ? document.fonts.ready.then(() => true) : Promise.resolve(true)`,
+          true
+        )
+
+        return await pdfWindow.webContents.printToPDF(printOptions || {})
+      } finally {
+        if (!pdfWindow.isDestroyed()) {
+          pdfWindow.destroy()
+        }
+      }
+    }
   )
 }
 

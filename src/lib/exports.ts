@@ -413,7 +413,6 @@ async function updateAttachmentLinksToObjectUrls(
 
   let contentWithValidImageSource = content
   const attachmentErrors: string[] = []
-  const attachmentUrls: string[] = []
   for (const attachmentKey of attachmentMatches) {
     const attachment = attachmentMap[attachmentKey]
     if (!attachment) {
@@ -435,10 +434,14 @@ async function updateAttachmentLinksToObjectUrls(
 
     let srcUrl = ''
     if (imageData.src) {
-      srcUrl = imageData.src
+      const fileBuffer = await readFileBuffer(excludeFileProtocol(imageData.src))
+      srcUrl = `data:image/png;base64,${Buffer.from(fileBuffer).toString(
+        'base64'
+      )}`
     } else if (imageData.blob) {
-      srcUrl = window.URL.createObjectURL(imageData.blob)
-      attachmentUrls.push(srcUrl)
+      srcUrl = `data:image/png;base64,${Buffer.from(
+        await imageData.blob.arrayBuffer()
+      ).toString('base64')}`
     }
     if (srcUrl) {
       contentWithValidImageSource = contentWithValidImageSource.replace(
@@ -456,7 +459,7 @@ async function updateAttachmentLinksToObjectUrls(
       )}],\nPlease check if attachments exists to properly export the PDF with attachments.`,
     })
   }
-  return [contentWithValidImageSource, attachmentUrls]
+  return [contentWithValidImageSource, []]
 }
 
 function revokeAttachmentsUrls(attachmentUrls: string[]) {
