@@ -78,10 +78,11 @@ const schema = mergeDeepRight(gh, {
 })
 
 export async function openDialog(): Promise<string> {
+  const defaultPath = await getPathByName('home')
   const result = await showOpenDialog({
     properties: ['openDirectory', 'createDirectory'],
     buttonLabel: 'Select Folder',
-    defaultPath: getPathByName('home'),
+    defaultPath,
   })
   if (result.canceled) {
     return ''
@@ -209,8 +210,9 @@ pre code {
 `
 }
 
-function getCssLinkCommonPath(prependFilePrefix = false) {
-  const pathPrefix = (prependFilePrefix ? 'file://' : '') + getPathByName('app')
+async function getCssLinkCommonPath(prependFilePrefix = false) {
+  const appPath = await getPathByName('app')
+  const pathPrefix = (prependFilePrefix ? 'file://' : '') + appPath
   return pathPrefix + (dev ? '/../node_modules' : '/compiled/app')
 }
 
@@ -220,8 +222,8 @@ async function getExportStylesInfo(
   previewStyle?: string
 ) {
   const cssStyles: CssStyleInfo[] = []
-  const cssLinkRoot = getCssLinkCommonPath(true)
-  const cssFileRoot = getCssLinkCommonPath(false)
+  const cssLinkRoot = await getCssLinkCommonPath(true)
+  const cssFileRoot = await getCssLinkCommonPath(false)
   const markdownCodeBlockTheme =
     codeBlockTheme === 'solarized-dark' ? 'solarized' : codeBlockTheme
   const appThemeCss = getGlobalCss(selectV2Theme(generalThemeName))

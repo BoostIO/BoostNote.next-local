@@ -92,10 +92,11 @@ const ExportProgressItem = ({
     }
     setDialogIsOpen(true)
     try {
+      const defaultPath = await getPathByName('home')
       const result = await showOpenDialog({
         properties: ['openDirectory', 'createDirectory'],
         buttonLabel: t('folder.select'),
-        defaultPath: getPathByName('home'),
+        defaultPath,
       })
       if (result.canceled) {
         return

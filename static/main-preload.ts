@@ -25,7 +25,8 @@
     shell: {
       openExternal: (url: string) =>
         ipcRenderer.invoke('shell:open-external', url),
-      openPath: (path: string) => ipcRenderer.invoke('shell:open-path', path),
+      openPath: (path: string, folderOnly = false) =>
+        ipcRenderer.invoke('shell:open-path', path, folderOnly),
       showItem: (path: string) => ipcRenderer.invoke('shell:show-item', path),
       getPathForFile: (file: File) => webUtils.getPathForFile(file),
     },

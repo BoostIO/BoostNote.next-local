@@ -33,14 +33,14 @@ const __ELECTRON_ONLY__: {
   showSaveDialog(
     options: Electron.SaveDialogOptions
   ): Promise<Electron.SaveDialogReturnValue>
-  openExternal(url: string): void
-  openPath(fullPath: string, folderOnly?: boolean): void
+  openExternal(url: string): Promise<void>
+  openPath(fullPath: string, folderOnly?: boolean): Promise<string>
   getPathForFile(file: File): string
   parseCSON(value: string): JsonValue
   stringifyCSON(value: any): string
   openNewWindow(options: BrowserWindowConstructorOptions): BrowserWindow
   openContextMenu(options: { menuItems: MenuItemConstructorOptions[] }): void
-  getPathByName(name: string): string
+  getPathByName(name: string): Promise<string>
   addIpcListener(
     channel: string,
     listener: (event: IpcRendererEvent, ...args: any[]) => void
@@ -79,8 +79,8 @@ const {
   readFileTypeFromBuffer,
   showOpenDialog,
   showSaveDialog,
-  openExternal,
-  openPath,
+  openExternal: openExternalUnsafe,
+  openPath: openPathUnsafe,
   getPathForFile,
   parseCSON,
   stringifyCSON,
@@ -103,6 +103,20 @@ const {
   setBadgeCount,
   got,
 } = __ELECTRON_ONLY__ || {}
+
+async function openExternal(url: string) {
+  return openExternalUnsafe(url)
+}
+
+async function openPath(fullPath: string, folderOnly = false) {
+  try {
+    return await openPathUnsafe(fullPath, folderOnly)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error(`Failed to request shell.openPath for ${fullPath}`, error)
+    return message
+  }
+}
 
 async function readFileAsString(pathname: string) {
   return readFile(pathname)

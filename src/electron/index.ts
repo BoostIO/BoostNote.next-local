@@ -169,12 +169,23 @@ function bindElectornOnlAPI() {
 
   // ---------------- DIALOG ----------------
 
-  ipcMain.handle('dialog:open', (_e, options) => {
-    return dialog.showOpenDialog(options)
+  ipcMain.handle('dialog:open', async (_e, options: Electron.OpenDialogOptions) => {
+    const result = await dialog.showOpenDialog(options)
+    return {
+      canceled: result.canceled,
+      filePaths: [...result.filePaths],
+      bookmarks:
+        result.bookmarks == null ? undefined : [...result.bookmarks],
+    }
   })
 
-  ipcMain.handle('dialog:save', (_e, options) => {
-    return dialog.showSaveDialog(options)
+  ipcMain.handle('dialog:save', async (_e, options: Electron.SaveDialogOptions) => {
+    const result = await dialog.showSaveDialog(options)
+    return {
+      canceled: result.canceled,
+      filePath: result.filePath,
+      bookmark: result.bookmark,
+    }
   })
 
   // ---------------- SHELL ----------------
@@ -183,9 +194,28 @@ function bindElectornOnlAPI() {
     return shell.openExternal(url)
   })
 
-  ipcMain.handle('shell:open-path', (_e, fullPath: string) => {
-    return shell.openPath(fullPath)
-  })
+  ipcMain.handle(
+    'shell:open-path',
+    async (_e, fullPath: string, folderOnly = false) => {
+      try {
+        if (typeof fullPath !== 'string' || fullPath.trim().length === 0) {
+          return 'Invalid path'
+        }
+
+        if (folderOnly) {
+          shell.showItemInFolder(fullPath)
+          return ''
+        }
+
+        return await shell.openPath(fullPath)
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error)
+        console.error(`Failed to open path: ${fullPath}`, error)
+        return message
+      }
+    }
+  )
 
   ipcMain.handle('shell:show-item', (_e, fullPath: string) => {
     return shell.showItemInFolder(fullPath)

@@ -181,13 +181,14 @@ const NoteContextView = ({ storage, note }: NoteContextViewProps) => {
   }, [note, preferences, pushMessage, storage.attachmentMap, previewStyle])
 
   const exportAsPdf = useCallback(async () => {
+    const defaultPath = path.join(
+      await getPathByName('home'),
+      filenamify(note.title) + '.pdf'
+    )
     showSaveDialog({
       properties: ['createDirectory', 'showOverwriteConfirmation'],
       buttonLabel: 'Save',
-      defaultPath: path.join(
-        getPathByName('home'),
-        filenamify(note.title) + '.pdf'
-      ),
+      defaultPath,
       filters: [
         {
           name: 'PDF',

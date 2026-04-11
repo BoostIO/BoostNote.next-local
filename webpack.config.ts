@@ -1,11 +1,15 @@
 import path from 'path'
+import { createRequire } from 'module'
+import { fileURLToPath } from 'url'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 
-import packageJson from './package.json'
+const require = createRequire(import.meta.url)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-module.exports = (_: any, argv: any) => {
+export default (_: any, argv: any) => {
   const config: any = {
     entry: ['./src/index.tsx'],
 
@@ -58,9 +62,6 @@ module.exports = (_: any, argv: any) => {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
         process: require.resolve('process/browser.js'),
-      }),
-      new webpack.DefinePlugin({
-        'process.env.VERSION': JSON.stringify(packageJson.version),
       }),
       new webpack.EnvironmentPlugin(['NODE_ENV']),
       new CopyPlugin({

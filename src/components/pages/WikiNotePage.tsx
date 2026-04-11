@@ -220,17 +220,18 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
   const includeFrontMatter = preferences['markdown.includeFrontMatter']
 
   useEffect(() => {
-    const handler = () => {
+    const handler = async () => {
       if (note == null) {
         return
       }
+      const defaultPath = path.join(
+        await getPathByName('home'),
+        filenamify(note.title) + '.md'
+      )
       showSaveDialog({
         properties: ['createDirectory', 'showOverwriteConfirmation'],
         buttonLabel: 'Save',
-        defaultPath: path.join(
-          getPathByName('home'),
-          filenamify(note.title) + '.md'
-        ),
+        defaultPath,
         filters: [
           {
             name: 'Markdown',
