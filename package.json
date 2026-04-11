@@ -64,7 +64,7 @@
     "@types/js-yaml": "^4.0.0",
     "@types/lodash": "^4.14.138",
     "@types/lodash.debounce": "^4.0.6",
-    "@types/node": "^12.7.5",
+    "@types/node": "^25.6.0",
     "@types/nprogress": "^0.2.0",
     "@types/pako": "^1.0.1",
     "@types/path-parse": "^1.0.19",
