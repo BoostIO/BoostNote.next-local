@@ -8,7 +8,7 @@ import { mapTopBarTree } from '../lib/v2/mappers/local/topbarTree'
 import { useDb } from '../lib/db'
 import { useGeneralStatus } from '../lib/generalStatus'
 import { useSearchModal } from '../lib/searchModal'
-import { addIpcListener, removeIpcListener } from '../lib/electronOnly'
+import { useIpcListener } from '../lib/useIpcListener'
 import SearchModal from './organisms/SearchModal'
 import SidebarContainer from './organisms/SidebarContainer'
 import ApplicationLayout from '../shared/components/molecules/ApplicationLayout'
@@ -135,12 +135,7 @@ const Application = ({
     selectPreviewMode,
   ])
 
-  useEffect(() => {
-    addIpcListener('toggle-preview-mode', togglePreviewMode)
-    return () => {
-      removeIpcListener('toggle-preview-mode', togglePreviewMode)
-    }
-  }, [togglePreviewMode])
+  useIpcListener('toggle-preview-mode', togglePreviewMode)
 
   const toggleSplitEditMode = useCallback(() => {
     if (noteViewMode === 'edit') {
@@ -150,12 +145,7 @@ const Application = ({
     }
   }, [noteViewMode, selectSplitMode, selectEditMode])
 
-  useEffect(() => {
-    addIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
-    return () => {
-      removeIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
-    }
-  }, [toggleSplitEditMode])
+  useIpcListener('toggle-split-edit-mode', toggleSplitEditMode)
 
   const toggleBookmark = useCallback(() => {
     if (note == null) {
@@ -168,12 +158,7 @@ const Application = ({
     }
   }, [note, unbookmark, bookmark])
 
-  useEffect(() => {
-    addIpcListener('toggle-bookmark', toggleBookmark)
-    return () => {
-      removeIpcListener('toggle-bookmark', toggleBookmark)
-    }
-  })
+  useIpcListener('toggle-bookmark', toggleBookmark)
 
   return (
     <>

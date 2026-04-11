@@ -8,11 +8,24 @@ import {
   protocol,
   session,
   autoUpdater,
+  dialog,
+  shell,
 } from 'electron'
 import path from 'path'
 import url from 'url'
 import { getTemplateFromKeymap } from './menu'
 import { dev } from './consts'
+import fs from 'fs'
+import { lookup } from 'mime-types'
+
+function waitForLoad(webContents: Electron.WebContents) {
+  return new Promise<void>((resolve, reject) => {
+    webContents.once('did-finish-load', () => resolve())
+    webContents.once('did-fail-load', (_event, _code, description) => {
+      reject(new Error(description))
+    })
+  })
+}
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null = null
@@ -40,8 +53,7 @@ function createMainWindow() {
       nodeIntegration: true,
       webSecurity: !dev,
       webviewTag: true,
-      enableRemoteModule: true,
-      contextIsolation: false,
+      contextIsolation: true,
       preload: dev
         ? path.join(app.getAppPath(), '../static/main-preload.js')
         : path.join(app.getAppPath(), './compiled/app/static/main-preload.js'),
@@ -138,6 +150,210 @@ app.on('activate', () => {
   }
 })
 
+// bind main ipc API for electron
+//
+//
+//
+function bindElectornOnlAPI() {
+  // --- App APIs ---
+  ipcMain.handle('app:get-path', (_e, name: string) => {
+    if (name === 'app') return app.getAppPath()
+    return app.getPath(name as any)
+  })
+
+  ipcMain.handle('app:set-badge-count', (_e, count: number) => {
+    return app.setBadgeCount(count)
+  })
+
+  ipcMain.handle('app:set-default-protocol', (_e, protocol: string) => {
+    return app.setAsDefaultProtocolClient(protocol)
+  })
+
+  ipcMain.handle('app:remove-default-protocol', (_e, protocol: string) => {
+    return app.removeAsDefaultProtocolClient(protocol)
+  })
+
+  ipcMain.handle('app:is-default-protocol', (_e, protocol: string) => {
+    return app.isDefaultProtocolClient(protocol)
+  })
+
+  // ---------------- DIALOG ----------------
+
+  ipcMain.handle(
+    'dialog:open',
+    async (_e, options: Electron.OpenDialogOptions) => {
+      const result = await dialog.showOpenDialog(options)
+      return {
+        canceled: result.canceled,
+        filePaths: [...result.filePaths],
+        bookmarks: result.bookmarks == null ? undefined : [...result.bookmarks],
+      }
+    }
+  )
+
+  ipcMain.handle(
+    'dialog:save',
+    async (_e, options: Electron.SaveDialogOptions) => {
+      const result = await dialog.showSaveDialog(options)
+      return {
+        canceled: result.canceled,
+        filePath: result.filePath,
+        bookmark: result.bookmark,
+      }
+    }
+  )
+
+  // ---------------- SHELL ----------------
+
+  ipcMain.handle('shell:open-external', (_e, url: string) => {
+    return shell.openExternal(url)
+  })
+
+  ipcMain.handle(
+    'shell:open-path',
+    async (_e, fullPath: string, folderOnly = false) => {
+      try {
+        if (typeof fullPath !== 'string' || fullPath.trim().length === 0) {
+          return 'Invalid path'
+        }
+
+        if (folderOnly) {
+          shell.showItemInFolder(fullPath)
+          return ''
+        }
+
+        return await shell.openPath(fullPath)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`Failed to open path: ${fullPath}`, error)
+        return message
+      }
+    }
+  )
+
+  ipcMain.handle('shell:show-item', (_e, fullPath: string) => {
+    return shell.showItemInFolder(fullPath)
+  })
+
+  // ---------------- FS ----------------
+
+  ipcMain.handle('fs:read-file', (_e, path: string) =>
+    fs.promises.readFile(path, 'utf8')
+  )
+  ipcMain.handle('fs:read-file-type', (_e, path: string) => {
+    return lookup(path) || null
+  })
+  ipcMain.handle('fs:read-file-buffer', (_e, path: string) =>
+    fs.promises.readFile(path)
+  )
+  ipcMain.handle('fs:write-file', (_e, path: string, data: any) =>
+    fs.promises.writeFile(path, data)
+  )
+  ipcMain.handle('fs:readdir', async (_e, path: string, options?: any) => {
+    const result = await fs.promises.readdir(path, options)
+
+    if (options === undefined || options.withFileTypes === false) {
+      return result
+    }
+
+    return result.map((dirent) => ({
+      name: dirent.name,
+      isDirectory: dirent.isDirectory(),
+      isFile: dirent.isFile(),
+      isSymbolicLink: dirent.isSymbolicLink(),
+    }))
+  })
+  ipcMain.handle('fs:unlink', (_e, path: string) => fs.promises.unlink(path))
+  ipcMain.handle('fs:stat', async (_e, path: string) => {
+    const stats = await fs.promises.stat(path)
+    return {
+      isDirectory: stats.isDirectory(),
+      isFile: stats.isFile(),
+      isSymbolicLink: stats.isSymbolicLink(),
+
+      size: stats.size,
+      mode: stats.mode,
+      mtimeMs: stats.mtimeMs,
+      atimeMs: stats.atimeMs,
+      birthtimeMs: stats.birthtimeMs,
+    }
+  })
+  ipcMain.handle('fs:mkdir', (_e, path: string) =>
+    fs.promises.mkdir(path, { recursive: true })
+  )
+
+  // ---------------- WINDOW ----------------
+  // todo: was:
+  // return new Promise((resolve, reject) => {
+  //   const encodedStr = encodeURIComponent(htmlString)
+  //   const { BrowserWindow } = electron.remote
+  //   const windowOptions = {
+  //     webPreferences: {
+  //       nodeIntegration: false,
+  //       webSecurity: false,
+  //       javascript: false,
+  //     },
+  //     show: false,
+  //   }
+  //   const browserWindow = new BrowserWindow(windowOptions)
+  //   browserWindow.loadURL('data:text/html;charset=UTF-8,' + encodedStr)
+  //
+  //   browserWindow.webContents.on('did-finish-load', async () => {
+  //     try {
+  //       const pdfFileBuffer = await browserWindow.webContents.printToPDF(
+  //         printOptions
+  //       )
+  //       resolve(pdfFileBuffer)
+  //     } catch (error) {
+  //       reject(error)
+  //     } finally {
+  //       browserWindow.destroy()
+  //     }
+  //   })
+  // })
+  ipcMain.handle(
+    'window:convert-html-to-pdf',
+    async (
+      _e,
+      htmlString: string,
+      printOptions: Electron.PrintToPDFOptions
+    ) => {
+      const pdfWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+          sandbox: false,
+          webSecurity: false,
+        },
+      })
+
+      try {
+        const htmlDataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(
+          htmlString
+        )}`
+
+        const loadPromise = waitForLoad(pdfWindow.webContents)
+        await pdfWindow.loadURL(htmlDataUrl)
+        await loadPromise
+
+        await pdfWindow.webContents.executeJavaScript(
+          `document.fonts ? document.fonts.ready.then(() => true) : Promise.resolve(true)`,
+          true
+        )
+
+        return await pdfWindow.webContents.printToPDF(printOptions || {})
+      } finally {
+        if (!pdfWindow.isDestroyed()) {
+          pdfWindow.destroy()
+        }
+      }
+    }
+  )
+}
+
+// =============================================
+// COMPAT LAYER: __ELECTRON_ONLY__ → electronAPI
+// =============================================
+
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
   /* This file protocol registration will be needed from v9.x.x for PDF export feature */
@@ -145,6 +361,7 @@ app.on('ready', () => {
     const pathname = decodeURI(request.url.replace('file:///', ''))
     callback(pathname)
   })
+  bindElectornOnlAPI()
   mainWindow = createMainWindow()
 
   ipcMain.on('menuAcceleratorChanged', (_, args) => {

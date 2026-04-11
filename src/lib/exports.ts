@@ -21,6 +21,7 @@ import {
   getPathByName,
   mkdir,
   readFile,
+  readFileBuffer,
   showOpenDialog,
   writeFile,
   readdir,
@@ -77,10 +78,11 @@ const schema = mergeDeepRight(gh, {
 })
 
 export async function openDialog(): Promise<string> {
+  const defaultPath = await getPathByName('home')
   const result = await showOpenDialog({
     properties: ['openDirectory', 'createDirectory'],
     buttonLabel: 'Select Folder',
-    defaultPath: getPathByName('home'),
+    defaultPath,
   })
   if (result.canceled) {
     return ''
@@ -127,10 +129,12 @@ async function exportNoteAssets(
         continue
       }
       if (data.type === 'src') {
-        const attachmentData = await readFile(excludeFileProtocol(data.src))
+        const attachmentData = await readFileBuffer(
+          excludeFileProtocol(data.src)
+        )
         await writeFile(
           join(attachmentsFolderPathname, attachmentFileName),
-          attachmentData
+          Buffer.from(attachmentData)
         )
       } else {
         await writeFile(
@@ -149,7 +153,7 @@ async function exportNoteAssets(
 }
 
 async function writeKatexFonts(assetsFolder: string) {
-  const cssLinkRoot = getCssLinkCommonPath(false)
+  const cssLinkRoot = await getCssLinkCommonPath(false)
   const katexFontsPath = dev
     ? `${cssLinkRoot}/katex/dist/fonts`
     : `${cssLinkRoot}/katex/fonts/`
@@ -159,8 +163,13 @@ async function writeKatexFonts(assetsFolder: string) {
     if (fontsFilenames.length > 0) {
       await mkdir(`${assetsFolder}/fonts/`)
       for (const fontFilename of fontsFilenames) {
-        const fontContents = await readFile(`${katexFontsPath}/${fontFilename}`)
-        await writeFile(`${assetsFolder}/fonts/${fontFilename}`, fontContents)
+        const fontContents = await readFileBuffer(
+          `${katexFontsPath}/${fontFilename}`
+        )
+        await writeFile(
+          `${assetsFolder}/fonts/${fontFilename}`,
+          Buffer.from(fontContents)
+        )
       }
     }
   } catch (error) {
@@ -201,8 +210,9 @@ pre code {
 `
 }
 
-function getCssLinkCommonPath(prependFilePrefix = false) {
-  const pathPrefix = (prependFilePrefix ? 'file://' : '') + getPathByName('app')
+async function getCssLinkCommonPath(prependFilePrefix = false) {
+  const appPath = await getPathByName('app')
+  const pathPrefix = (prependFilePrefix ? 'file://' : '') + appPath
   return pathPrefix + (dev ? '/../node_modules' : '/compiled/app')
 }
 
@@ -212,8 +222,8 @@ async function getExportStylesInfo(
   previewStyle?: string
 ) {
   const cssStyles: CssStyleInfo[] = []
-  const cssLinkRoot = getCssLinkCommonPath(true)
-  const cssFileRoot = getCssLinkCommonPath(false)
+  const cssLinkRoot = await getCssLinkCommonPath(true)
+  const cssFileRoot = await getCssLinkCommonPath(false)
   const markdownCodeBlockTheme =
     codeBlockTheme === 'solarized-dark' ? 'solarized' : codeBlockTheme
   const appThemeCss = getGlobalCss(selectV2Theme(generalThemeName))
@@ -403,7 +413,6 @@ async function updateAttachmentLinksToObjectUrls(
 
   let contentWithValidImageSource = content
   const attachmentErrors: string[] = []
-  const attachmentUrls: string[] = []
   for (const attachmentKey of attachmentMatches) {
     const attachment = attachmentMap[attachmentKey]
     if (!attachment) {
@@ -425,10 +434,16 @@ async function updateAttachmentLinksToObjectUrls(
 
     let srcUrl = ''
     if (imageData.src) {
-      srcUrl = imageData.src
+      const fileBuffer = await readFileBuffer(
+        excludeFileProtocol(imageData.src)
+      )
+      srcUrl = `data:image/png;base64,${Buffer.from(fileBuffer).toString(
+        'base64'
+      )}`
     } else if (imageData.blob) {
-      srcUrl = window.URL.createObjectURL(imageData.blob)
-      attachmentUrls.push(srcUrl)
+      srcUrl = `data:image/png;base64,${Buffer.from(
+        await imageData.blob.arrayBuffer()
+      ).toString('base64')}`
     }
     if (srcUrl) {
       contentWithValidImageSource = contentWithValidImageSource.replace(
@@ -446,7 +461,7 @@ async function updateAttachmentLinksToObjectUrls(
       )}],\nPlease check if attachments exists to properly export the PDF with attachments.`,
     })
   }
-  return [contentWithValidImageSource, attachmentUrls]
+  return [contentWithValidImageSource, []]
 }
 
 function revokeAttachmentsUrls(attachmentUrls: string[]) {

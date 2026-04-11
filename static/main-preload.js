@@ -1,284 +1,132 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { parse } = require('url')
-
 ;(function () {
   if (typeof require === 'undefined') {
     return
   }
+
   const electron = require('electron')
-  window.electron = electron
-  const fs = require('fs')
-  const FileType = require('file-type')
-  const readChunk = require('read-chunk')
-  const CSON = require('cson-parser')
-  const got = require('got')
-  const isSvg = require('is-svg')
+  const ipcRenderer = electron.ipcRenderer
+  const contextBridge = electron.contextBridge
+  const webUtils = electron.webUtils
 
-  function openExternal(url) {
-    const { protocol } = parse(url)
-    switch (protocol) {
-      case 'http:':
-      case 'https:':
-        console.log('opening ...', url)
-        electron.shell.openExternal(url)
-        return
-      default:
-        console.warn(`${protocol} protocol is not supported`)
+  const electronAPI = {
+    app: {
+      getPath: (name) => ipcRenderer.invoke('app:get-path', name),
+      setBadgeCount: (n) => ipcRenderer.invoke('app:set-badge-count', n),
+      setDefaultProtocol: (p) =>
+        ipcRenderer.invoke('app:set-default-protocol', p),
+      removeDefaultProtocol: (p) =>
+        ipcRenderer.invoke('app:remove-default-protocol', p),
+      isDefaultProtocol: (p) =>
+        ipcRenderer.invoke('app:is-default-protocol', p),
+    },
+
+    shell: {
+      openExternal: (url) => ipcRenderer.invoke('shell:open-external', url),
+      openPath: (targetPath, folderOnly = false) =>
+        ipcRenderer.invoke('shell:open-path', targetPath, folderOnly),
+      showItem: (targetPath) =>
+        ipcRenderer.invoke('shell:show-item', targetPath),
+      getPathForFile: (file) => webUtils.getPathForFile(file),
+    },
+
+    fs: {
+      readFile: (p) => ipcRenderer.invoke('fs:read-file', p),
+      readFileType: (p) => ipcRenderer.invoke('fs:read-file-type', p),
+      readFileBuffer: (p) => ipcRenderer.invoke('fs:read-file-buffer', p),
+      writeFile: (p, d) => ipcRenderer.invoke('fs:write-file', p, d),
+      readdir: (p, o) => ipcRenderer.invoke('fs:readdir', p, o),
+      unlink: (p) => ipcRenderer.invoke('fs:unlink', p),
+      stat: (p) => ipcRenderer.invoke('fs:stat', p),
+      mkdir: (p) => ipcRenderer.invoke('fs:mkdir', p),
+    },
+
+    dialog: {
+      open: (opts) => ipcRenderer.invoke('dialog:open', opts),
+      save: (opts) => ipcRenderer.invoke('dialog:save', opts),
+    },
+
+    window: {
+      create: (opts) => ipcRenderer.invoke('window:create', opts),
+      setButtonPosition: (pos) =>
+        ipcRenderer.invoke('window:set-button-position', pos),
+      convertHtmlToPdf: (htmlString, printOptions) =>
+        ipcRenderer.invoke(
+          'window:convert-html-to-pdf',
+          htmlString,
+          printOptions
+        ),
+    },
+
+    cookies: {
+      set: (c) => ipcRenderer.invoke('cookies:set', c),
+      get: (f) => ipcRenderer.invoke('cookies:get', f),
+      remove: (u, n) => ipcRenderer.invoke('cookies:remove', u, n),
+    },
+
+    ipc: {
+      send: (ch, d) => ipcRenderer.send(ch, d),
+      on: (ch, fn) => ipcRenderer.on(ch, fn),
+      off: (ch, fn) => ipcRenderer.off(ch, fn),
+      removeAll: () => ipcRenderer.removeAllListeners(),
+    },
+  }
+
+  contextBridge.exposeInMainWorld('electronAPI', electronAPI)
+
+  function createElectronOnlyAdapter(api) {
+    return {
+      readFile: api.fs.readFile,
+      readFileBuffer: api.fs.readFileBuffer,
+      readdir: api.fs.readdir,
+      writeFile: api.fs.writeFile,
+      unlinkFile: api.fs.unlink,
+      stat: api.fs.stat,
+      mkdir: api.fs.mkdir,
+
+      readFileType: api.fs.readFileType,
+      readFileTypeFromBuffer: api.fs.readFileTypeFromBuffer,
+
+      showOpenDialog: api.dialog.open,
+      showSaveDialog: api.dialog.save,
+
+      openExternal: api.shell.openExternal,
+      openPath: api.shell.openPath,
+      getPathForFile: api.shell.getPathForFile,
+
+      parseCSON: api.utils && api.utils.parseCSON,
+      stringifyCSON: api.utils && api.utils.stringifyCSON,
+
+      openNewWindow: api.window.create,
+      openContextMenu: (options) =>
+        api.window.openContextMenu && api.window.openContextMenu(options),
+      setTrafficLightPosition: api.window.setButtonPosition,
+      getPathByName: api.app.getPath,
+
+      addIpcListener: api.ipc.on,
+      sendIpcMessage: api.ipc.send,
+      removeIpcListener: api.ipc.off,
+      removeAllIpcListeners: api.ipc.removeAll,
+
+      setAsDefaultProtocolClient: api.app.setDefaultProtocol,
+      removeAsDefaultProtocolClient: api.app.removeDefaultProtocol,
+      isDefaultProtocolClient: api.app.isDefaultProtocol,
+
+      getWebContentsById: api.window.getWebContentsById,
+
+      setCookie: api.cookies.set,
+      getCookie: api.cookies.get,
+      removeCookie: api.cookies.remove,
+
+      setBadgeCount: api.app.setBadgeCount,
+
+      got: api.net && api.net.got,
+
+      convertHtmlStringToPdfBuffer: api.window.convertHtmlToPdf,
     }
   }
 
-  function openPath(fullPath, folderOnly = true) {
-    if (folderOnly) {
-      console.log('opening path in folder...', fullPath)
-      electron.shell.showItemInFolder(fullPath)
-    } else {
-      electron.shell.openPath(fullPath).finally(() => {
-        console.log('Opening...', fullPath)
-      })
-    }
-  }
-
-  function readFile(pathname) {
-    return new Promise((resolve, reject) => {
-      fs.readFile(pathname, (error, result) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve(result)
-      })
-    })
-  }
-  function readdir(pathname, options) {
-    return new Promise((resolve, reject) => {
-      fs.readdir(pathname, options, (error, result) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve(result)
-      })
-    })
-  }
-  function showOpenDialog(options) {
-    return electron.remote.dialog.showOpenDialog(options)
-  }
-  function showSaveDialog(options) {
-    return electron.remote.dialog.showSaveDialog(options)
-  }
-  function getHomePath() {
-    return electron.remote.app.getPath('home')
-  }
-  function writeFile(pathname, buffer) {
-    return new Promise((resolve, reject) => {
-      fs.writeFile(pathname, buffer, (error) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve()
-      })
-    })
-  }
-  function unlinkFile(pathname) {
-    return new Promise((resolve, reject) => {
-      fs.unlink(pathname, (error) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve()
-      })
-    })
-  }
-  function stat(pathname) {
-    return new Promise((resolve, reject) => {
-      fs.stat(pathname, (error, stats) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve(stats)
-      })
-    })
-  }
-  function mkdir(pathname) {
-    return new Promise((resolve, reject) => {
-      fs.mkdir(pathname, { recursive: true }, (error) => {
-        if (error != null) {
-          reject(error)
-          return
-        }
-        resolve()
-      })
-    })
-  }
-
-  async function readFileType(pathname) {
-    const buffer = readChunk.sync(pathname, 0, 1024 * 1024)
-    return readFileTypeFromBuffer(buffer)
-  }
-
-  async function readFileTypeFromBuffer(buffer) {
-    try {
-      const result = await FileType.fromBuffer(buffer)
-      if (result != null) {
-        return result.mime
-      }
-      if (isSvg(buffer)) {
-        return 'image/svg+xml'
-      }
-      throw new Error('Failed to detect file type from the buffer')
-    } catch (error) {
-      console.warn(error)
-      return ''
-    }
-  }
-
-  function parseCSON(value) {
-    return CSON.parse(value)
-  }
-
-  function stringifyCSON(value) {
-    return CSON.stringify(value)
-  }
-
-  function openNewWindow(options) {
-    return new electron.remote.BrowserWindow(options)
-  }
-
-  function openContextMenu(options) {
-    const { Menu } = electron.remote
-    const menu = Menu.buildFromTemplate(options.menuItems)
-    menu.popup()
-  }
-
-  function getPathByName(name) {
-    const { app } = electron.remote
-    if (name === 'app') {
-      return app.getAppPath()
-    }
-    return app.getPath(name)
-  }
-
-  function addIpcListener(channel, listener) {
-    const { ipcRenderer } = electron
-    ipcRenderer.on(channel, listener)
-  }
-
-  function sendIpcMessage(channel, data) {
-    const { ipcRenderer } = electron
-    ipcRenderer.send(channel, data)
-  }
-
-  function removeIpcListener(channel, listener) {
-    const { ipcRenderer } = electron
-    ipcRenderer.removeListener(channel, listener)
-  }
-
-  function removeAllIpcListeners(channel) {
-    const { ipcRenderer } = electron
-    ipcRenderer.removeListener(channel)
-  }
-
-  function setAsDefaultProtocolClient(protocol) {
-    return electron.remote.app.setAsDefaultProtocolClient(protocol)
-  }
-
-  function removeAsDefaultProtocolClient(protocol) {
-    return electron.remote.app.removeAsDefaultProtocolClient(protocol)
-  }
-
-  function isDefaultProtocolClient(protocol) {
-    return electron.remote.app.isDefaultProtocolClient(protocol)
-  }
-  function getWebContentsById(id) {
-    return electron.remote.webContents.fromId(id)
-  }
-
-  function setTrafficLightPosition(position) {
-    electron.remote.getCurrentWindow().setTrafficLightPosition(position)
-  }
-
-  function convertHtmlStringToPdfBuffer(htmlString, printOptions) {
-    return new Promise((resolve, reject) => {
-      const encodedStr = encodeURIComponent(htmlString)
-      const { BrowserWindow } = electron.remote
-      const windowOptions = {
-        webPreferences: {
-          nodeIntegration: false,
-          webSecurity: false,
-          javascript: false,
-        },
-        show: false,
-      }
-      const browserWindow = new BrowserWindow(windowOptions)
-      browserWindow.loadURL('data:text/html;charset=UTF-8,' + encodedStr)
-
-      browserWindow.webContents.on('did-finish-load', async () => {
-        try {
-          const pdfFileBuffer = await browserWindow.webContents.printToPDF(
-            printOptions
-          )
-          resolve(pdfFileBuffer)
-        } catch (error) {
-          reject(error)
-        } finally {
-          browserWindow.destroy()
-        }
-      })
-    })
-  }
-
-  function setCookie(cookieDetails) {
-    return electron.remote.session.defaultSession.cookies.set(cookieDetails)
-  }
-
-  function getCookie(cookieDetails) {
-    return electron.remote.session.defaultSession.cookies.get(cookieDetails)
-  }
-
-  function removeCookie(url, name) {
-    return electron.remote.session.defaultSession.cookies.remove(url, name)
-  }
-
-  function setBadgeCount(count) {
-    const { app } = electron.remote
-    return app.setBadgeCount(count)
-  }
-
-  window.__ELECTRON_ONLY__ = {}
-  window.__ELECTRON_ONLY__.openExternal = openExternal
-  window.__ELECTRON_ONLY__.openPath = openPath
-  window.__ELECTRON_ONLY__.readFile = readFile
-  window.__ELECTRON_ONLY__.showOpenDialog = showOpenDialog
-  window.__ELECTRON_ONLY__.showSaveDialog = showSaveDialog
-  window.__ELECTRON_ONLY__.getHomePath = getHomePath
-  window.__ELECTRON_ONLY__.writeFile = writeFile
-  window.__ELECTRON_ONLY__.unlinkFile = unlinkFile
-  window.__ELECTRON_ONLY__.readdir = readdir
-  window.__ELECTRON_ONLY__.stat = stat
-  window.__ELECTRON_ONLY__.mkdir = mkdir
-  window.__ELECTRON_ONLY__.readFileType = readFileType
-  window.__ELECTRON_ONLY__.readFileTypeFromBuffer = readFileTypeFromBuffer
-  window.__ELECTRON_ONLY__.parseCSON = parseCSON
-  window.__ELECTRON_ONLY__.stringifyCSON = stringifyCSON
-  window.__ELECTRON_ONLY__.openNewWindow = openNewWindow
-  window.__ELECTRON_ONLY__.openContextMenu = openContextMenu
-  window.__ELECTRON_ONLY__.getPathByName = getPathByName
-  window.__ELECTRON_ONLY__.addIpcListener = addIpcListener
-  window.__ELECTRON_ONLY__.sendIpcMessage = sendIpcMessage
-  window.__ELECTRON_ONLY__.removeIpcListener = removeIpcListener
-  window.__ELECTRON_ONLY__.removeAllIpcListeners = removeAllIpcListeners
-  window.__ELECTRON_ONLY__.setAsDefaultProtocolClient = setAsDefaultProtocolClient
-  window.__ELECTRON_ONLY__.removeAsDefaultProtocolClient = removeAsDefaultProtocolClient
-  window.__ELECTRON_ONLY__.isDefaultProtocolClient = isDefaultProtocolClient
-  window.__ELECTRON_ONLY__.getWebContentsById = getWebContentsById
-  window.__ELECTRON_ONLY__.setTrafficLightPosition = setTrafficLightPosition
-  window.__ELECTRON_ONLY__.convertHtmlStringToPdfBuffer = convertHtmlStringToPdfBuffer
-  window.__ELECTRON_ONLY__.setCookie = setCookie
-  window.__ELECTRON_ONLY__.getCookie = getCookie
-  window.__ELECTRON_ONLY__.removeCookie = removeCookie
-  window.__ELECTRON_ONLY__.setBadgeCount = setBadgeCount
-  window.__ELECTRON_ONLY__.got = got
+  contextBridge.exposeInMainWorld(
+    '__ELECTRON_ONLY__',
+    createElectronOnlyAdapter(electronAPI)
+  )
 })()

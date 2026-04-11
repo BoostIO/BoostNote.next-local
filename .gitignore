@@ -9,6 +9,7 @@ node_modules/*
 Desktop.ini
 Thumbs.db
 *.log
+*.swp
 .idea/
 compiled/*
 dist/*
@@ -19,6 +20,7 @@ compiled-cloud
 electron/*
 !electron/.gitkeep
 report*.json
+src/**/*.js
 
 .now
 .vercel

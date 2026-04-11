@@ -1,3 +1,5 @@
+import { getPathForFile } from './electronOnly'
+
 export function convertFileListToArray(fileList: FileList): File[] {
   const files: File[] = []
   for (let i = 0; i < fileList.length; i++) {
@@ -35,7 +37,7 @@ export function inspectDataTransfer(dataTransfer: DataTransfer) {
     return {
       name: file.name,
       type: file.type,
-      path: file.path,
+      path: getPathForFile == null ? undefined : getPathForFile(file),
       size: file.size,
       lastModified: file.lastModified,
     }

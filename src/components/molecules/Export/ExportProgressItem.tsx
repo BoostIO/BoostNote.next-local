@@ -92,10 +92,11 @@ const ExportProgressItem = ({
     }
     setDialogIsOpen(true)
     try {
+      const defaultPath = await getPathByName('home')
       const result = await showOpenDialog({
         properties: ['openDirectory', 'createDirectory'],
         buttonLabel: t('folder.select'),
-        defaultPath: getPathByName('home'),
+        defaultPath,
       })
       if (result.canceled) {
         return
@@ -259,6 +260,48 @@ const ExportProgressItem = ({
       exportProcedureData.recursive,
     ]
   )
+  const exportAsMd = async (noteDoc: NoteDoc, exportPath: string) => {
+    const mdString = convertNoteDocToMarkdownString(noteDoc, includeFrontMatter)
+    const filename = `${exportPath}.md`
+    await writeFile(filename, mdString)
+  }
+
+  const exportAsPdf = async (
+    noteDoc: NoteDoc,
+    exportPath: string,
+    attachmentMap: ObjectMap<Attachment>
+  ) => {
+    const pdfBuffer = await convertNoteDocToPdfBuffer(
+      noteDoc,
+      preferences['markdown.codeBlockTheme'],
+      preferences['general.theme'],
+      pushMessage,
+      attachmentMap,
+      preferences['export.printOptions'],
+      previewStyle
+    )
+    const filename = `${exportPath}.pdf`
+    await writeFile(filename, pdfBuffer)
+  }
+
+  const exportAsHtml = async (
+    noteDoc: NoteDoc,
+    folderPath: string,
+    filename: string,
+    attachmentMap: ObjectMap<Attachment>
+  ) => {
+    await exportNoteAsHtmlFile(
+      folderPath,
+      filename,
+      noteDoc,
+      preferences['markdown.codeBlockTheme'],
+      preferences['general.theme'],
+      pushMessage,
+      attachmentMap,
+      previewStyle,
+      true
+    )
+  }
 
   const exportNotes = useCallback(
     async (
@@ -279,10 +322,11 @@ const ExportProgressItem = ({
         const exportNoteFilenameWithoutExtension = `${filenamify(
           getValidNoteTitle(noteDoc)
         )}`
-        const exportNotePathname = join(
+        const exportNotePathnameNoExt = join(
           join(rootDir, noteExportFolder),
-          `${exportNoteFilenameWithoutExtension}.${exportProcedureData.exportType}`
+          exportNoteFilenameWithoutExtension
         )
+        const exportNotePathname = `${exportNotePathnameNoExt}.${exportProcedureData.exportType}`
         setExportState({
           exportProgressValue: convertValueToPercentage(
             exportingNoteIndex / notesToExport.length
@@ -297,16 +341,11 @@ const ExportProgressItem = ({
         })
         switch (exportProcedureData.exportType) {
           case 'html':
-            await exportNoteAsHtmlFile(
+            await exportAsHtml(
+              noteDoc as NoteDoc,
               join(rootDir, noteExportFolder),
               exportNoteFilenameWithoutExtension,
-              noteDoc as NoteDoc,
-              preferences['markdown.codeBlockTheme'],
-              preferences['general.theme'],
-              pushMessage,
-              attachmentMap,
-              previewStyle,
-              true
+              attachmentMap
             ).catch((err) => {
               addExportError(
                 `Cannot export: '${exportNotePathname.substring(
@@ -316,12 +355,44 @@ const ExportProgressItem = ({
             })
             break
           case 'md':
-            const mdString = await convertNoteDocToMarkdownString(
-              noteDoc as NoteDoc,
-              includeFrontMatter
-            )
             try {
-              await writeFile(exportNotePathname, mdString)
+              await exportAsMd(noteDoc as NoteDoc, exportNotePathnameNoExt)
+            } catch (err) {
+              addExportError(
+                `Cannot export: '${exportNotePathname.substring(
+                  exportNotePathname.lastIndexOf('/')
+                )}', reason: ${err}`
+              )
+            }
+            break
+          case 'all':
+            try {
+              await exportAsMd(noteDoc as NoteDoc, exportNotePathnameNoExt)
+            } catch (err) {
+              addExportError(
+                `Cannot export: '${exportNotePathname.substring(
+                  exportNotePathname.lastIndexOf('/')
+                )}', reason: ${err}`
+              )
+            }
+            await exportAsHtml(
+              noteDoc as NoteDoc,
+              join(rootDir, noteExportFolder),
+              exportNoteFilenameWithoutExtension,
+              attachmentMap
+            ).catch((err) => {
+              addExportError(
+                `Cannot export: '${exportNotePathname.substring(
+                  exportNotePathname.lastIndexOf('/')
+                )}', reason: ${err}`
+              )
+            })
+            try {
+              await exportAsPdf(
+                noteDoc as NoteDoc,
+                exportNotePathnameNoExt,
+                attachmentMap
+              )
             } catch (err) {
               addExportError(
                 `Cannot export: '${exportNotePathname.substring(
@@ -333,16 +404,11 @@ const ExportProgressItem = ({
           case 'pdf':
           default:
             try {
-              const pdfBuffer = await convertNoteDocToPdfBuffer(
+              await exportAsPdf(
                 noteDoc as NoteDoc,
-                preferences['markdown.codeBlockTheme'],
-                preferences['general.theme'],
-                pushMessage,
-                attachmentMap,
-                preferences['export.printOptions'],
-                previewStyle
+                exportNotePathnameNoExt,
+                attachmentMap
               )
-              await writeFile(exportNotePathname, pdfBuffer)
             } catch (err) {
               addExportError(
                 `Cannot export: '${exportNotePathname.substring(

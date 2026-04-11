@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import _Chart from 'chart.js'
+import { Chart as ChartJS, registerables } from 'chart.js'
 import YAML from 'js-yaml'
 import { Node } from 'unist'
 import visit from 'unist-util-visit'
@@ -11,25 +11,39 @@ interface ChartProps {
   isYml?: boolean
 }
 
-_Chart.defaults.global.animation = undefined
+// register once
+ChartJS.register(...registerables)
+
+// disable animations globally
+ChartJS.defaults.animation = false
+
+interface ChartProps {
+  config: string
+  isYml?: boolean
+}
 
 export const Chart = ({ config, isYml = false }: ChartProps) => {
   const eleRef = useRef<HTMLCanvasElement>(null)
-  const chartRef = useRef<{ destroy: Function }>()
+  const chartRef = useRef<ChartJS | null>(null)
   const [err, setErr] = useState(false)
 
   useEffect(() => {
-    if (eleRef.current == null) return
+    if (!eleRef.current) return
 
-    if (chartRef.current != null) {
+    if (chartRef.current) {
       chartRef.current.destroy()
     }
 
     try {
       setErr(false)
       const parsed = isYml ? YAML.load(config) : JSON.parse(config)
-      chartRef.current = new _Chart(eleRef.current.getContext('2d'), parsed)
-    } catch (err) {
+
+      chartRef.current = new ChartJS(
+        eleRef.current.getContext('2d')!,
+        parsed as any
+      )
+    } catch (e) {
+      console.error(e)
       setErr(true)
     }
   }, [config, isYml])
@@ -81,7 +95,7 @@ export function rehypeChart({ tagName, isYml = false }: RehypeChartProps) {
         const value = node.children[0].value
         try {
           const parsed = isYml ? YAML.load(value) : JSON.parse(value)
-          const chartData = new _Chart(
+          const chartData = new ChartJS(
             chartCanvasElement.getContext('2d'),
             parsed
           )

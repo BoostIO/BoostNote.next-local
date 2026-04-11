@@ -3,9 +3,19 @@ import { Node } from 'unist'
 import { deflateRaw } from 'pako'
 
 const PLANT_SUPPORTED = ['plantuml', 'ditaa']
+const PLANT_TAGS = {
+  plantuml: {
+    start: '@startuml',
+    end: '@enduml',
+  },
+  ditaa: {
+    start: '@startditaa',
+    end: '@endditaa',
+  },
+} as const
 
 interface MdastPlant extends Node {
-  lang: string
+  lang: keyof typeof PLANT_TAGS
   value: string
 }
 
@@ -17,7 +27,8 @@ export function remarkPlantUML({ server }: RemarkPlantUMLConfig) {
   return (tree: Node) => {
     visit(tree, isPlantNode, (node) => {
       const type = node.lang === 'ditaa' ? 'png' : 'svg'
-      const compressed = deflateRaw(unescape(encodeURIComponent(node.value)), {
+      const source = wrapPlantSource(node.lang, node.value)
+      const compressed = deflateRaw(unescape(encodeURIComponent(source)), {
         to: 'string',
       })
 
@@ -33,6 +44,29 @@ function isPlantNode(node: any): node is MdastPlant {
     typeof node.lang === 'string' &&
     PLANT_SUPPORTED.includes(node.lang)
   )
+}
+
+function wrapPlantSource(lang: keyof typeof PLANT_TAGS, value: string): string {
+  const source = stripLeadingLanguageDirective(lang, value.trim())
+  const { start, end } = PLANT_TAGS[lang]
+
+  if (source.startsWith(start)) {
+    return source
+  }
+
+  return [start, source, end].join('\n')
+}
+
+function stripLeadingLanguageDirective(
+  lang: keyof typeof PLANT_TAGS,
+  source: string
+): string {
+  const lines = source.split('\n')
+  if (lines[0]?.trim().toLowerCase() !== lang) {
+    return source
+  }
+
+  return lines.slice(1).join('\n').trim()
 }
 
 function encode64(data: string) {

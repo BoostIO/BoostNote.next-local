@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import Router from './Router'
 import { ThemeProvider } from 'styled-components'
 import { useDb } from '../lib/db'
@@ -10,7 +10,6 @@ import { useEffectOnce } from 'react-use'
 import { useRouter } from '../lib/router'
 import { values, keys, prependNoteIdPrefix, size } from '../lib/db/utils'
 import { useActiveStorageId } from '../lib/routeParams'
-import { addIpcListener, removeIpcListener } from '../lib/electronOnly'
 import { getNoteFullItemId } from '../lib/nav'
 import { useBoostNoteProtocol } from '../lib/protocol'
 import { IpcRendererEvent } from 'electron/renderer'
@@ -29,6 +28,7 @@ import {
   applyBoldStyleEventEmitter,
   applyItalicStyleEventEmitter,
 } from '../lib/events'
+import { useIpcListener } from '../lib/useIpcListener'
 
 const LoadingText = styled.div`
   margin: 30px;
@@ -94,86 +94,59 @@ const App = () => {
       })
   })
 
-  useEffect(() => {
-    const noteLinkNavigateEventHandler = (
-      _: IpcRendererEvent,
-      noteHref: string
-    ) => {
-      const noteId = Array.isArray(noteHref) ? noteHref[0] : noteHref
-      if (!activeStorageId) {
-        pushMessage({
-          title: 'Invalid navigation!',
-          description: 'Cannot open note link without storage information.',
-        })
-      } else {
-        const noteIdWithPrefix = prependNoteIdPrefix(noteId)
-        let noteStorageId = activeStorageId
-        if (storageMap != null) {
-          for (const storage of values(storageMap)) {
-            if (storage.noteMap[noteIdWithPrefix] != null) {
-              noteStorageId = storage.id
-              break
-            }
+  useIpcListener('note:navigate', (_: IpcRendererEvent, noteHref: string) => {
+    const noteId = Array.isArray(noteHref) ? noteHref[0] : noteHref
+    if (!activeStorageId) {
+      pushMessage({
+        title: 'Invalid navigation!',
+        description: 'Cannot open note link without storage information.',
+      })
+    } else {
+      const noteIdWithPrefix = prependNoteIdPrefix(noteId)
+      let noteStorageId = activeStorageId
+      if (storageMap != null) {
+        for (const storage of values(storageMap)) {
+          if (storage.noteMap[noteIdWithPrefix] != null) {
+            noteStorageId = storage.id
+            break
           }
         }
+      }
 
-        getNotePathname(noteStorageId, noteIdWithPrefix)
-          .then((pathname) => {
-            if (pathname) {
-              replace(getNoteFullItemId(noteStorageId, pathname, noteId))
-            } else {
-              pushMessage({
-                title: 'Note link invalid!',
-                description: 'The note link you are trying to open is invalid.',
-              })
-            }
-          })
-          .catch(() => {
+      getNotePathname(noteStorageId, noteIdWithPrefix)
+        .then((pathname) => {
+          if (pathname) {
+            replace(getNoteFullItemId(noteStorageId, pathname, noteId))
+          } else {
             pushMessage({
               title: 'Note link invalid!',
               description: 'The note link you are trying to open is invalid.',
             })
+          }
+        })
+        .catch(() => {
+          pushMessage({
+            title: 'Note link invalid!',
+            description: 'The note link you are trying to open is invalid.',
           })
-      }
+        })
     }
-    addIpcListener('note:navigate', noteLinkNavigateEventHandler)
-    return () => {
-      removeIpcListener('note:navigate', noteLinkNavigateEventHandler)
-    }
-  }, [activeStorageId, getNotePathname, pushMessage, replace, storageMap])
+  })
 
-  useEffect(() => {
-    const preferencesIpcEventHandler = () => {
-      togglePreferencesModal()
-    }
-    addIpcListener('preferences', preferencesIpcEventHandler)
+  useIpcListener('preferences', () => {
+    togglePreferencesModal()
+  })
 
-    const createLocalSpaceHandler = () => {
-      push('/app/storages')
-    }
-    addIpcListener('create-local-space', createLocalSpaceHandler)
+  useIpcListener('create-local-space', () => {
+    push('/app/storages')
+  })
 
-    return () => {
-      removeIpcListener('preferences', preferencesIpcEventHandler)
-      removeIpcListener('create-local-space', createLocalSpaceHandler)
-    }
-  }, [togglePreferencesModal, push])
+  useIpcListener('apply-bold-style', () => {
+    applyBoldStyleEventEmitter.dispatch()
+  })
 
-  useEffectOnce(() => {
-    const applyBoldStyleIpcEventHandler = () => {
-      applyBoldStyleEventEmitter.dispatch()
-    }
-    const applyItalicStyleIpcEventHandler = () => {
-      applyItalicStyleEventEmitter.dispatch()
-    }
-
-    addIpcListener('apply-bold-style', applyBoldStyleIpcEventHandler)
-    addIpcListener('apply-italic-style', applyItalicStyleIpcEventHandler)
-
-    return () => {
-      removeIpcListener('apply-bold-style', applyBoldStyleIpcEventHandler)
-      removeIpcListener('apply-italic-style', applyItalicStyleIpcEventHandler)
-    }
+  useIpcListener('apply-italic-style', () => {
+    applyItalicStyleEventEmitter.dispatch()
   })
 
   const switchWorkspaceHandler = useCallback(
@@ -198,12 +171,7 @@ const App = () => {
     [storageMap, navigateToStorage, pushMessage]
   )
 
-  useEffect(() => {
-    addIpcListener('switch-workspace', switchWorkspaceHandler)
-    return () => {
-      removeIpcListener('switch-workspace', switchWorkspaceHandler)
-    }
-  }, [switchWorkspaceHandler])
+  useIpcListener('switch-workspace', switchWorkspaceHandler)
 
   useBoostNoteProtocol()
 
