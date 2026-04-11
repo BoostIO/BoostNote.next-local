@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { FormCheckItem } from '../atoms/form'
 import { SimpleFormSelect } from '../../shared/components/molecules/Form/atoms/FormSelect'
 import Form from '../../shared/components/molecules/Form'
-import { parseNumberStringOrReturnZero } from '../../lib/string'
 
 const ExportTab = () => {
   const { t } = useTranslation()
@@ -16,12 +15,9 @@ const ExportTab = () => {
       setPreferences({
         'export.printOptions': {
           ...preferences['export.printOptions'],
-          // todo: check this calculations...
           margins: {
-            top: parseNumberStringOrReturnZero(marginsType),
-            bottom: parseNumberStringOrReturnZero(marginsType),
-            left: parseNumberStringOrReturnZero(marginsType),
-            right: parseNumberStringOrReturnZero(marginsType),
+            ...preferences['export.printOptions'].margins,
+            marginType: marginsType,
           },
         },
       })
@@ -91,14 +87,14 @@ const ExportTab = () => {
                 element: (
                   <SimpleFormSelect
                     value={
-                      preferences['export.printOptions'].margins!.marginType +
-                      ''
+                      preferences['export.printOptions'].margins!.marginType ||
+                      MarginType.DefaultMargins
                     }
                     onChange={selectMargins}
                     options={[
-                      MarginType.NoMargins + '',
-                      MarginType.DefaultMargins + '',
-                      MarginType.MinimumMargins + '',
+                      MarginType.NoMargins,
+                      MarginType.DefaultMargins,
+                      MarginType.MinimumMargins,
                     ]}
                     labels={[
                       'No margins',

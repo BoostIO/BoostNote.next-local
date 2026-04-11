@@ -2,13 +2,11 @@ import path from 'path'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
-import packageJson from './package.json'
-import 'webpack-dev-server'
-// Make sure it's up top with your other imports like 'path' and 'webpack'
-import { Configuration } from 'webpack'
 
-module.exports = (_: any, argv: Configuration) => {
-  const config: webpack.Configuration = {
+import packageJson from './package.json'
+
+module.exports = (_: any, argv: any) => {
+  const config: any = {
     entry: ['./src/index.tsx'],
 
     output: {
@@ -142,104 +140,6 @@ module.exports = (_: any, argv: Configuration) => {
       },
 
       hot: true,
-
-      //   setupMiddlewares: (middlewares, app) => {
-      //     if (!app) {
-      //       throw new Error('webpack-dev-server is not defined')
-      //     }
-      //
-      //     middlewares.push({
-      //       name: '/app/codemirror/mode',
-      //       path: express.static(
-      //         path.join(__dirname, 'node_modules/codemirror/mode')
-      //       ),
-      //     })
-      //
-      //     app.server.use(
-      //       '/app/codemirror/addon',
-      //       express.static(path.join(__dirname, 'node_modules/codemirror/addon'))
-      //     )
-      //
-      //     app.server.use(
-      //       '/app/codemirror/theme',
-      //       express.static(path.join(__dirname, 'node_modules/codemirror/theme'))
-      //     )
-      //
-      //     app.server.use(
-      //       '/app/katex/katex.min.css',
-      //       express.static(
-      //         path.join(__dirname, 'node_modules/katex/dist/katex.min.css')
-      //       )
-      //     )
-      //
-      //     app.server.use(
-      //       '/app/remark-admonitions/classic.css',
-      //       express.static(
-      //         path.join(
-      //           __dirname,
-      //           'node_modules/remark-admonitions/styles/classic.css'
-      //         )
-      //       )
-      //     )
-      //
-      //     app.server.use(
-      //       '/app/static',
-      //       express.static(path.join(__dirname, 'static'))
-      //     )
-      //
-      //     return middlewares
-      //   },
-      // },
-      // devServer: {
-      //   host: 'localhost',
-      //   port: 3000,
-      //
-      //   historyApiFallback: {
-      //     index: '/app',
-      //   },
-      //   // respond to 404s with index.html
-      //
-      //   hot: true,
-      //   // enable HMR on the server
-      //   // @ts-ignore (Adding this so TypeScript doesn't yell at you if versions are mismatched)
-      //   setupMiddlewares: (middlewares, devServer) => {
-      //     if (devServer === undefined) {
-      //       throw new Error('webpack-dev-server is not defined')
-      //     }
-      //     // We cast to 'any' to bypass the "Property use does not exist" error
-      //     const app = devServer.server
-      //     app.server.use(
-      //       '/app/codemirror/mode',
-      //       express.static(path.join(__dirname, 'node_modules/codemirror/mode'))
-      //     )
-      //     app.server.use(
-      //       '/app/codemirror/addon',
-      //       express.static(path.join(__dirname, 'node_modules/codemirror/addon'))
-      //     )
-      //     app.server.use(
-      //       '/app/codemirror/theme',
-      //       express.static(path.join(__dirname, 'node_modules/codemirror/theme'))
-      //     )
-      //     app.server.use(
-      //       '/app/katex/katex.min.css',
-      //       express.static(
-      //         path.join(__dirname, 'node_modules/katex/dist/katex.min.css')
-      //       )
-      //     )
-      //     app.server.use(
-      //       '/app/remark-admonitions/classic.css',
-      //       express.static(
-      //         path.join(
-      //           __dirname,
-      //           'node_modules/remark-admonitions/styles/classic.css'
-      //         )
-      //       )
-      //     )
-      //     app.server.use('/app/static', express.static(path.join(__dirname, 'static')))
-      //
-      //     // You MUST return the middlewares array in this new syntax
-      //     return middlewares
-      //   },
     },
 
     resolve: {

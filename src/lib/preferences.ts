@@ -34,9 +34,9 @@ export type PreferencesTab =
   | 'import'
   | 'general'
 export enum MarginType {
-  DefaultMargins = 0,
-  NoMargins = 1,
-  MinimumMargins = 2,
+  DefaultMargins = 'default',
+  NoMargins = 'none',
+  MinimumMargins = 'printableArea',
 }
 export enum PageSize {
   A3 = 'A3',
@@ -107,6 +107,26 @@ function loadPreferences() {
   }
 }
 
+function normalizeMarginType(
+  marginType?: Electron.Margins['marginType'] | MarginType | number
+): Electron.Margins['marginType'] {
+  switch (marginType) {
+    case 0:
+      return MarginType.DefaultMargins
+    case 1:
+      return MarginType.NoMargins
+    case 2:
+      return MarginType.MinimumMargins
+    case MarginType.NoMargins:
+    case MarginType.MinimumMargins:
+    case 'custom':
+      return marginType
+    case MarginType.DefaultMargins:
+    default:
+      return MarginType.DefaultMargins
+  }
+}
+
 function savePreferences(preferences: Partial<Preferences>) {
   localLiteStorage.setItem(
     preferencesKey,
@@ -115,6 +135,17 @@ function savePreferences(preferences: Partial<Preferences>) {
 }
 
 const initialPreferences = loadPreferences()
+
+const basePrintMargins: Electron.Margins = {
+  marginType: MarginType.DefaultMargins,
+}
+
+const basePrintOptions: Electron.PrintToPDFOptions = {
+  printBackground: false,
+  landscape: false,
+  margins: basePrintMargins,
+  pageSize: PageSize.A4,
+}
 
 const basePreferences: Preferences = {
   // General
@@ -140,17 +171,7 @@ const basePreferences: Preferences = {
   'markdown.includeFrontMatter': true,
 
   // Export
-  'export.printOptions': {
-    printBackground: false,
-    landscape: false,
-    margins: {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    },
-    pageSize: PageSize.A4,
-  },
+  'export.printOptions': basePrintOptions,
 
   // Keymap
   'general.keymap': new Map<string, KeymapItem>(),
@@ -175,9 +196,22 @@ function usePreferencesStore() {
     } catch (e) {
       console.warn('Corrupted storage, preferences keymap was null!')
     }
+    const printOptions = preferences['export.printOptions']
     return {
       ...basePreferences,
       ...preferences,
+      'export.printOptions': {
+        ...basePrintOptions,
+        ...printOptions,
+        margins: {
+          ...basePrintMargins,
+          ...(printOptions || {}).margins,
+          marginType: normalizeMarginType(
+            (printOptions || {}).margins &&
+              (printOptions || {}).margins!.marginType
+          ),
+        },
+      },
       'general.keymap': keymap,
     }
   }, [preferences])

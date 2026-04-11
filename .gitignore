@@ -20,6 +20,7 @@ compiled-cloud
 electron/*
 !electron/.gitkeep
 report*.json
+src/**/*.js
 
 .now
 .vercel
