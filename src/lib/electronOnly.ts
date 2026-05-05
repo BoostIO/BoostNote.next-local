@@ -141,7 +141,7 @@ async function prepareDirectory(pathname: string) {
       )
     }
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if (error.message?.includes('ENOENT')) {
       await mkdir(pathname)
     } else {
       throw error

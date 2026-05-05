@@ -780,7 +780,7 @@ class FSNoteDb implements NoteDb {
       const rawContent = await readFileAsString(jsonPathname)
       this.data = JSON.parse(rawContent)
     } catch (error) {
-      if (error.code === 'ENOENT') {
+      if (error.message?.includes('ENOENT')) {
         const defaultBoostNoteJSON: StorageJSONData = {
           folderMap: {},
           tagMap: {},

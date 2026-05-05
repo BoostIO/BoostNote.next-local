@@ -92,73 +92,10 @@ const MarkdownPreviewer = ({
   const activeStorageId = useActiveStorageId()
   const { pushMessage } = useToast()
 
-  const remarkAdmonitionOptions = {
-    tag: ':::',
-    icons: 'emoji',
-    infima: false,
-  }
-
-  const rehypeReactConfig = {
-    createElement: React.createElement,
-    Fragment: React.Fragment,
-    components: {
-      img: ({ src, ...props }: any) => {
-        if (src != null && !src.match('/')) {
-          const attachment = attachmentMap[src]
-          if (attachment != null) {
-            return <AttachmentImage attachment={attachment} {...props} />
-          }
-        }
-
-        return <ExpandableImage {...props} src={src} />
-      },
-      a: ({ href, children }: any) => {
-        return (
-          <a
-            className={'markdown__custom__note_link'}
-            href={href}
-            onClick={(event) => {
-              event.preventDefault()
-              if (href) {
-                if (isNoteLinkId(href)) {
-                  navigateToNote(href)
-                } else {
-                  openNew(href)
-                }
-              }
-            }}
-          >
-            {children}
-          </a>
-        )
-      },
-      input: (props: React.HTMLProps<HTMLInputElement>) => {
-        const { type, checked } = props
-
-        if (type !== 'checkbox') {
-          return <input {...props} />
-        }
-
-        return (
-          <MarkdownCheckbox
-            index={checkboxIndexRef.current++}
-            checked={checked}
-            updateContent={updateContent}
-          />
-        )
-      },
-      pre: CodeFence,
-      flowchart: ({ children }: any) => {
-        return <Flowchart code={children[0]} />
-      },
-      chart: ({ children }: any) => {
-        return <Chart config={children[0]} />
-      },
-      'chart(yaml)': ({ children }: any) => {
-        return <Chart config={children[0]} isYml={true} />
-      },
-    },
-  }
+  const remarkAdmonitionOptions = useMemo(
+    () => ({ tag: ':::', icons: 'emoji', infima: false }),
+    []
+  )
 
   const navigateToNote = useCallback(
     (noteId) => {
@@ -199,6 +136,71 @@ const MarkdownPreviewer = ({
       }
     },
     [activeStorageId, pushMessage, storageMap, getNotePathname, replace]
+  )
+
+  const rehypeReactConfig = useMemo(
+    () => ({
+      createElement: React.createElement,
+      Fragment: React.Fragment,
+      components: {
+        img: ({ src, ...props }: any) => {
+          if (src != null && !src.match('/')) {
+            const attachment = attachmentMap[src]
+            if (attachment != null) {
+              return <AttachmentImage attachment={attachment} {...props} />
+            }
+          }
+
+          return <ExpandableImage {...props} src={src} />
+        },
+        a: ({ href, children }: any) => {
+          return (
+            <a
+              className={'markdown__custom__note_link'}
+              href={href}
+              onClick={(event) => {
+                event.preventDefault()
+                if (href) {
+                  if (isNoteLinkId(href)) {
+                    navigateToNote(href)
+                  } else {
+                    openNew(href)
+                  }
+                }
+              }}
+            >
+              {children}
+            </a>
+          )
+        },
+        input: (props: React.HTMLProps<HTMLInputElement>) => {
+          const { type, checked } = props
+
+          if (type !== 'checkbox') {
+            return <input {...props} />
+          }
+
+          return (
+            <MarkdownCheckbox
+              index={checkboxIndexRef.current++}
+              checked={checked}
+              updateContent={updateContent}
+            />
+          )
+        },
+        pre: CodeFence,
+        flowchart: ({ children }: any) => {
+          return <Flowchart code={children[0]} />
+        },
+        chart: ({ children }: any) => {
+          return <Chart config={children[0]} />
+        },
+        'chart(yaml)': ({ children }: any) => {
+          return <Chart config={children[0]} isYml={true} />
+        },
+      },
+    }),
+    [attachmentMap, updateContent, navigateToNote]
   )
 
   const markdownProcessor = useMemo(() => {
@@ -258,7 +260,7 @@ const MarkdownPreviewer = ({
     previousContentRef.current = content
     previousThemeRef.current = codeBlockTheme
     renderContent()
-  }, [content, codeBlockTheme, rendering, renderContent, renderedContent])
+  }, [content, codeBlockTheme, renderContent])
 
   const StyledContainer = useMemo(() => {
     return styled.div`
