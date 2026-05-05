@@ -382,7 +382,7 @@ async function readdirOrEmpty(pathname: string) {
   try {
     return await readdir(pathname)
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if (error.message?.includes('ENOENT')) {
       return []
     }
     throw error
