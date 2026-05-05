@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from '../../../lib/styled'
 import { LoadingButton } from '../../atoms/Button'
 import cc from 'classcat'
@@ -23,6 +23,13 @@ const Form: AppComponent<FormProps> = ({
   className,
 }) => {
   const [submitState, setSubmitState] = useState(false)
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   return (
     <Container
       onSubmit={async (event: React.FormEvent) => {
@@ -31,15 +38,11 @@ const Form: AppComponent<FormProps> = ({
         }
 
         event.preventDefault()
-        if (onSubmit == null) {
-          return
-        }
         setSubmitState(true)
-        new Promise(async (resolve) => {
-          await onSubmit(event)
+        await onSubmit(event)
+        if (mountedRef.current) {
           setSubmitState(false)
-          resolve(true)
-        })
+        }
       }}
       className={cc(['form', className])}
     >
